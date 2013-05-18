@@ -35,24 +35,7 @@ int main( int argc, char* args[] )
 
 
 
-///-------------------------------------
-///putting test materials into grid
-    int i,j;
-    for(i=0 ; i<GRID_WIDTH ; i++){
-		for(j=0 ; j<GRID_HEIGHT ; j++){
-			cellData[i][j] = M_water;
-		}
-    }
-    for(i=0 ; i<5 ; i++){
-		cellData[get_rand(0,GRID_WIDTH-1)][get_rand(0,GRID_HEIGHT-1)] = M_grass;
-	}
-	for(i=0 ; i<GRID_WIDTH ; i++){
-		cellData[i][GRID_HEIGHT-1] = M_rock;
-	}
-	for(i=0 ; i<GRID_WIDTH ; i+=2){
-		cellData[i][0] = M_spring;
-	}
-///--------------------------------------
+
 
     //While the user hasn't quit
     while( quit == false ){
