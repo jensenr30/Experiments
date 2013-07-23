@@ -1,10 +1,48 @@
+#include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "Windows.h"
 #include <process.h>
 
 #include "SDL.h"
 #include "SDL_net.h"
+#define MAXLEN 1024
+
+
+
+//  these are the glbal variables for the ip to connect to and the tcp.
+IPaddress ip;
+TCPsocket tcpsock;
+SDLNet_SocketSet myset;
+
+
+void *checkTCP(void *threadid)
+{
+	//continually check
+	int i;
+	char msg[MAXLEN];
+	int result;
+	printf("Listening on %d.%d.%d.%d:%d\n", ip.host%0x100, ip.host%0x10000 - ip.host%0x100, ip.host/0x10000 - (ip.host/0x1000000)*0x100, ip.host/0x1000000, ip.port);
+	while(1){
+	result=SDLNet_CheckSockets(myset, 1000);
+		if(result==-1) {
+			printf("SDLNet_CheckSockets: %s\n", SDLNet_GetError());
+			//most of the time this is a system error, where perror might help you.
+			perror("SDLNet_CheckSockets");
+			break; // leave loop
+		}
+		else if(result > 0){
+			//blank msg. this is necessary for some shitty reason...
+			for(i=0; i<MAXLEN; i++) msg[i] = '\0';
+			// receive some text from tcpsock
+			result=SDLNet_TCP_Recv(tcpsock,msg,MAXLEN);
+			printf(">>> %s",msg);
+		}
+	}
+	return NULL;
+}
+
 
 int main(int argc, char* argv[]){
 	
@@ -36,18 +74,13 @@ int main(int argc, char* argv[]){
         link_version->minor,
         link_version->patch);
 	
-	
-	// connect to localhost at port 9999 using TCP (client)
-	IPaddress ip;
-	TCPsocket tcpsock;
-	
+	printf("\n\nEnter a host to connect to\t\t(i.e. google.com, 192.168.1.1, localhost, etc...)\n\n");
 	
 	//get address
 	int i;
-	#define maxadd 80
-	char address[maxadd];
+	char address[MAXLEN];
 	
-	for(i=0; i<80; i++){
+	for(i=0; i<MAXLEN; i++){
 		address[i] = getchar();
 		if(address[i] == '\n') {
 			address[i] = '\0';
@@ -55,7 +88,7 @@ int main(int argc, char* argv[]){
 		}
 	}
 	
-	if(SDLNet_ResolveHost(&ip,address,80)==-1) {
+	if(SDLNet_ResolveHost(&ip,address,21)==-1) {
 		printf("Couldn't resolve hostname");
 		exit(3);
 	}
@@ -97,8 +130,6 @@ int main(int argc, char* argv[]){
 	}
 	
 	// Create a socket set to handle up to 16 sockets
-	SDLNet_SocketSet myset;
-
 	myset=SDLNet_AllocSocketSet(1);
 	if(!myset) {
 		printf("SDLNet_AllocSocketSet: %s\n", SDLNet_GetError());
@@ -111,7 +142,6 @@ int main(int argc, char* argv[]){
 	// send a hello over sock
 	//TCPsocket sock;
 	int len,result;
-	#define MAXLEN 1024
 	char msg[MAXLEN];
 	int k;
 	//add tcp socket to the socket myset
@@ -120,6 +150,16 @@ int main(int argc, char* argv[]){
 		printf("SDLNet_AddSocket: %s\n", SDLNet_GetError());
 		// perhaps you need to restart the myset and make it bigger...
 	}
+	
+	//start listening to TCP connection.
+	pthread_t threads;
+	int rc;
+	rc = pthread_create(&threads, NULL, checkTCP, (void *)1);
+	if (rc){
+		printf("ERROR; return code from pthread_create() is %d\n", rc);
+		exit(-1);
+	}
+	
 	
 	while(1){
 		for(k=0; k<MAXLEN -1; k++){
@@ -130,29 +170,16 @@ int main(int argc, char* argv[]){
 			}
 			
 		}
-		
+		if(strcmp(msg, "/exit\n") == 0){
+			pthread_cancel(threads);
+			break;
+		}
 		len=strlen(msg)+1; // add one for the terminating NULL
-		printf("Sending: %s", msg);
 		result=SDLNet_TCP_Send(tcpsock,msg,len);
 		if(result<len) {
 			printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
 			// It may be good to disconnect sock because it is likely invalid now.
 			break;
-		}
-		
-		result=SDLNet_CheckSockets(myset, 1000);
-		if(result==-1) {
-			printf("SDLNet_CheckSockets: %s\n", SDLNet_GetError());
-			//most of the time this is a system error, where perror might help you.
-			perror("SDLNet_CheckSockets");
-		}
-		else if(result == 0){
-			printf("no activity\n");
-		}
-		else{
-			// receive some text from tcpsock
-			result=SDLNet_TCP_Recv(tcpsock,msg,MAXLEN);
-			printf("Received: \"%s\"\n",msg);
 		}
 	}
 	
@@ -172,5 +199,6 @@ int main(int argc, char* argv[]){
 	SDL_Quit();
 	// you could SDL_Quit(); here...or not.
 	
-	return 0;
+	pthread_exit(NULL);
+	exit(0);
 }

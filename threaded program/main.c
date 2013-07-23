@@ -6,26 +6,25 @@
 
 void *PrintHello(void *threadid)
 {
-   long tid;
-   tid = (long)threadid;
-   printf("Hello World! It's me, thread #%ld!\n", tid);
-   pthread_exit(NULL);
+	long tid;
+	tid = (long)threadid;
+	printf("Hello World! It's me, thread #%ld!\n", tid);
+	pthread_exit(NULL);
+	return 0;
 }
 
 int main (int argc, char *argv[])
 {
-   pthread_t threads[NUM_THREADS];
-   int rc;
-   long t;
-   for(t=0; t<NUM_THREADS; t++){
-      printf("In main: creating thread %ld\n", t);
-      rc = pthread_create(&threads[t], NULL, PrintHello, (void *)t);
-      if (rc){
-         printf("ERROR; return code from pthread_create() is %d\n", rc);
-         exit(-1);
-      }
-   }
+	pthread_t threads;
+	int rc;
+	printf("In main: creating thread %d\n", 1);
+	rc = pthread_create(&threads, NULL, PrintHello, (void *)1);
+	if (rc){
+		printf("ERROR; return code from pthread_create() is %d\n", rc);
+		exit(-1);
+	}
 
-   /* Last thing that main() should do */
-   pthread_exit(NULL);
+	/* Last thing that main() should do */
+	pthread_exit(NULL);
+	return 0;
 }
