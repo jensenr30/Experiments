@@ -8,6 +8,7 @@
 #include "SDL.h"
 #include "SDL_net.h"
 #define MAXLEN 1024
+#define MAXLENPORT 6
 
 
 
@@ -21,9 +22,11 @@ void *checkTCP(void *threadid)
 {
 	//continually check
 	int i;
+	int blankMessages = 0; // counts how many blank messages have been received
 	char msg[MAXLEN];
 	int result;
-	printf("Listening on %d.%d.%d.%d:%d\n", ip.host%0x100, ip.host%0x10000 - ip.host%0x100, ip.host/0x10000 - (ip.host/0x1000000)*0x100, ip.host/0x1000000, ip.port);
+	//printf("Connected to %d.%d.%d.%d:%d\n", ip.host%0x100, ip.host%0x10000 - ip.host%0x100, ip.host/0x10000 - (ip.host/0x1000000)*0x100, ip.host/0x1000000, ip.port);
+	printf("Connection Established!\n");
 	while(1){
 	result=SDLNet_CheckSockets(myset, 1000);
 		if(result==-1) {
@@ -37,7 +40,15 @@ void *checkTCP(void *threadid)
 			for(i=0; i<MAXLEN; i++) msg[i] = '\0';
 			// receive some text from tcpsock
 			result=SDLNet_TCP_Recv(tcpsock,msg,MAXLEN);
-			printf(">>> %s",msg);
+			if(strcmp(msg, "") == 0)blankMessages++;
+			else{
+				blankMessages = 0;
+				printf(">>> %s",msg);
+			}
+			if(blankMessages >= 50){
+				printf("Connection Lost!\n");
+				break;
+			}
 		}
 	}
 	return NULL;
@@ -74,22 +85,44 @@ int main(int argc, char* argv[]){
         link_version->minor,
         link_version->patch);
 	
-	printf("\n\nEnter a host to connect to\t\t(i.e. google.com, 192.168.1.1, localhost, etc...)\n\n");
+	printf("\nEnter a host to connect to  \t(i.e. google.com, 192.168.1.1, localhost, etc...)\n");
+	
 	
 	//get address
-	int i;
+	int i,j;
 	char address[MAXLEN];
+	char port[MAXLENPORT];
+	for(i=0; i<MAXLENPORT; i++) port[i] = '\0';
 	
 	for(i=0; i<MAXLEN; i++){
+		//input user's char
 		address[i] = getchar();
+		// if you reach a newline character, replace it with a null character
 		if(address[i] == '\n') {
 			address[i] = '\0';
 			break;
 		}
+		//if the user entered a port
+		else if(address[i] == ':'){
+			address[i] = '\0'; // truncate and find port if it exists
+			for(j=0; j<MAXLENPORT; j++){
+				port[j] = getchar();
+				if(port[j] == '\n'){
+					port[j] = '\0';
+					i = MAXLEN;
+					break;
+				}
+			}
+		}
 	}
 	
-	if(SDLNet_ResolveHost(&ip,address,21)==-1) {
-		printf("Couldn't resolve hostname");
+	unsigned short portNumber;
+	if(port[0] >= '0' && port[0] <= '9') portNumber = atoi(port);
+	else portNumber = 21;
+	printf("Port = %d\n", portNumber);
+	
+	if( SDLNet_ResolveHost(&ip,address,portNumber) == -1) {
+		printf("Couldn't resolve hostname: %s:%d", address, portNumber);
 		exit(3);
 	}
 	
@@ -118,11 +151,13 @@ int main(int argc, char* argv[]){
 	ip.port = 80;
 	*/
 	
-	printf("IPaddress = %d.%d.%d.%d:%d\n",ip3,ip2,ip1,ip0,ip.port);
+	printf("IPaddress = %d.%d.%d.%d:%d\n",ip3,ip2,ip1,ip0,portNumber);
+	
+	
 	
 	
 	//opens that TCP
-	printf("Opening TCP socket\n");
+	//printf("Opening TCP socket\n");
 	tcpsock=SDLNet_TCP_Open(&ip);
 	if(!tcpsock) {
 		printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
