@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "SDL.h"
-#include "SDL_net.h"
+#include "SDL_net.h" 
 #include <string.h>
 
 //  these are the glbal variables for the ip to connect to and the tcp.
@@ -16,12 +16,19 @@ int main(int argc, char** argv){
 	
 	//get an IP.
 	IPaddress ip;
-	SDLNet_ResolveHost(&ip, NULL, 1234);
+	SDLNet_ResolveHost(&ip, NULL, 25565);
 	
 	TCPsocket server = SDLNet_TCP_Open(&ip);
 	TCPsocket client;
 	
-	const char *text = "Hello There! Welcome!";
+	char text[100] = "\%";
+	text[2] = 50;
+	text[3] = 10;
+	text[4] = 35;
+	text[5] = 43;
+	text[6] = 40;
+	text[7] = 21;
+	text[8] = 24;
 	
 	while(1){
 		client = SDLNet_TCP_Accept(server);
