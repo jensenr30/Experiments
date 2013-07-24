@@ -1,16 +1,7 @@
-#include <pthread.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "Windows.h"
-#include <process.h>
-
 #include "SDL.h"
 #include "SDL_net.h"
-#define MAXLEN 1024
-#define MAXLENPORT 6
-
-
+#include <string.h>
 
 //  these are the glbal variables for the ip to connect to and the tcp.
 IPaddress ip;
@@ -18,222 +9,33 @@ TCPsocket tcpsock;
 SDLNet_SocketSet myset;
 
 
-void *checkTCP(void *threadid)
-{
-	//continually check
-	int i;
-	int blankMessages = 0; // counts how many blank messages have been received
-	char msg[MAXLEN];
-	int result;
-	//printf("Connected to %d.%d.%d.%d:%d\n", ip.host%0x100, ip.host%0x10000 - ip.host%0x100, ip.host/0x10000 - (ip.host/0x1000000)*0x100, ip.host/0x1000000, ip.port);
-	printf("Connection Established!\n");
-	while(1){
-	result=SDLNet_CheckSockets(myset, 1000);
-		if(result==-1) {
-			printf("SDLNet_CheckSockets: %s\n", SDLNet_GetError());
-			//most of the time this is a system error, where perror might help you.
-			perror("SDLNet_CheckSockets");
-			break; // leave loop
-		}
-		else if(result > 0){
-			//blank msg. this is necessary for some shitty reason...
-			for(i=0; i<MAXLEN; i++) msg[i] = '\0';
-			// receive some text from tcpsock
-			result=SDLNet_TCP_Recv(tcpsock,msg,MAXLEN);
-			if(strcmp(msg, "") == 0)blankMessages++;
-			else{
-				blankMessages = 0;
-				printf(">>> %s",msg);
-			}
-			if(blankMessages >= 50){
-				printf("Connection Lost!\n");
-				break;
-			}
-		}
-	}
-	return NULL;
-}
-
-
-int main(int argc, char* argv[]){
+int main(int argc, char** argv){
 	
+	SDL_Init(SDL_INIT_EVERYTHING);
+	SDLNet_Init();
 	
-	if(SDL_Init(0)==-1) {
-		printf("SDL_Init: %s\n", SDL_GetError());
-		exit(1);
-	}
-	//enable console
-	freopen( "CON", "w", stdout );
-	freopen( "CON", "w", stderr );
-	if(SDLNet_Init()==-1) {
-		printf("SDLNet_Init: %s\n", SDLNet_GetError());
-		exit(2);
-	}
+	//get an IP.
+	IPaddress ip;
+	SDLNet_ResolveHost(&ip, NULL, 1234);
 	
-	SDL_version compile_version;
+	TCPsocket server = SDLNet_TCP_Open(&ip);
+	TCPsocket client;
 	
-	const SDL_version *link_version=SDLNet_Linked_Version();
-	
-	SDL_NET_VERSION(&compile_version);
-	
-	printf("compiled with SDL_net version: %d.%d.%d\n",
-        compile_version.major,
-        compile_version.minor,
-        compile_version.patch);
-	printf("running with SDL_net version: %d.%d.%d\n", 
-        link_version->major,
-        link_version->minor,
-        link_version->patch);
-	
-	printf("\nEnter a host to connect to  \t(i.e. google.com, 192.168.1.1, localhost, etc...)\n");
-	
-	
-	//get address
-	int i,j;
-	char address[MAXLEN];
-	char port[MAXLENPORT];
-	for(i=0; i<MAXLENPORT; i++) port[i] = '\0';
-	
-	for(i=0; i<MAXLEN; i++){
-		//input user's char
-		address[i] = getchar();
-		// if you reach a newline character, replace it with a null character
-		if(address[i] == '\n') {
-			address[i] = '\0';
-			break;
-		}
-		//if the user entered a port
-		else if(address[i] == ':'){
-			address[i] = '\0'; // truncate and find port if it exists
-			for(j=0; j<MAXLENPORT; j++){
-				port[j] = getchar();
-				if(port[j] == '\n'){
-					port[j] = '\0';
-					i = MAXLEN;
-					break;
-				}
-			}
-		}
-	}
-	
-	unsigned short portNumber;
-	if(port[0] >= '0' && port[0] <= '9') portNumber = atoi(port);
-	else portNumber = 21;
-	printf("Port = %d\n", portNumber);
-	
-	if( SDLNet_ResolveHost(&ip,address,portNumber) == -1) {
-		printf("Couldn't resolve hostname: %s:%d", address, portNumber);
-		exit(3);
-	}
-	
-	
-	
-	//this turns the ip.host (0x6789asdf) into this:
-	//ip3 = 0x67; ip2 = 0x89; ip1 = 0xas; ip = 0xdf;
-	unsigned short ip3,ip2,ip1,ip0;
-	ip0 = ip.host/0x1000000;
-	ip1 = ip.host/0x10000 - ip0*0x100;
-	ip2 = ip.host/0x100 - ip1*0x100 - ip0*0x10000;
-	ip3 = ip.host%0x100;
-	//ip.port = 80;
-	
-	//choose local ip address
-	/*
-	unsigned short ip3,ip2,ip1,ip0;
-	ip3 = 127;
-	ip2 = 0;
-	ip1 = 0;
-	ip0 = 1;
-	
-	//put data into ip
-	ip.host = 0;
-	ip.host += ip3*0x1000000 + ip2*0x10000 + ip1*0x100 + ip0;
-	ip.port = 80;
-	*/
-	
-	printf("IPaddress = %d.%d.%d.%d:%d\n",ip3,ip2,ip1,ip0,portNumber);
-	
-	
-	
-	
-	//opens that TCP
-	//printf("Opening TCP socket\n");
-	tcpsock=SDLNet_TCP_Open(&ip);
-	if(!tcpsock) {
-		printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
-		exit(4);
-	}
-	
-	// Create a socket set to handle up to 16 sockets
-	myset=SDLNet_AllocSocketSet(1);
-	if(!myset) {
-		printf("SDLNet_AllocSocketSet: %s\n", SDLNet_GetError());
-		exit(1); //most of the time this is a major error, but do what you want.
-	}
-	
-	
-	
-	
-	// send a hello over sock
-	//TCPsocket sock;
-	int len,result;
-	char msg[MAXLEN];
-	int k;
-	//add tcp socket to the socket myset
-	result=SDLNet_TCP_AddSocket(myset,tcpsock);
-	if(result==-1) {
-		printf("SDLNet_AddSocket: %s\n", SDLNet_GetError());
-		// perhaps you need to restart the myset and make it bigger...
-	}
-	
-	//start listening to TCP connection.
-	pthread_t threads;
-	int rc;
-	rc = pthread_create(&threads, NULL, checkTCP, (void *)1);
-	if (rc){
-		printf("ERROR; return code from pthread_create() is %d\n", rc);
-		exit(-1);
-	}
-	
+	const char *text = "Hello There! Welcome!";
 	
 	while(1){
-		for(k=0; k<MAXLEN -1; k++){
-			msg[k] = getchar();
-			if(msg[k] == '\n'){
-					msg[k+1] = '\0';
-			break;
-			}
-			
-		}
-		if(strcmp(msg, "/exit\n") == 0){
-			pthread_cancel(threads);
-			break;
-		}
-		len=strlen(msg)+1; // add one for the terminating NULL
-		result=SDLNet_TCP_Send(tcpsock,msg,len);
-		if(result<len) {
-			printf("SDLNet_TCP_Send: %s\n", SDLNet_GetError());
-			// It may be good to disconnect sock because it is likely invalid now.
+		client = SDLNet_TCP_Accept(server);
+		if(client){
+			//here you can communicate with the client.
+			//use the client socket to communicate to the client.
+			SDLNet_TCP_Send(client, text, strlen(text)+1);
+			SDLNet_TCP_Close(client);
 			break;
 		}
 	}
+	SDLNet_TCP_Close(server);
 	
-	
-	printf("closing TCP socket\n");
-	SDLNet_TCP_Close(tcpsock);
-	
-	
-	
-	
-	
-	
-	
-	printf("Closing SDL_net\n");
 	SDLNet_Quit();
-	printf("closing SDL\n");
 	SDL_Quit();
-	// you could SDL_Quit(); here...or not.
-	
-	pthread_exit(NULL);
-	exit(0);
+	return 0;
 }
