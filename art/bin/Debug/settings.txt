@@ -1,0 +1,27 @@
+these are the initial comments.
+
+maxSize
+	(greater or equal to 1)
+		it is the max size of the rectangles printed to the screen.
+
+rectanglesPerCycle
+	(greater or equal to  1)
+		The higher this is, the more rectangles are printed to the sceen every cycle.
+
+colorVariance
+	(greater or equal to 0)
+		this tells you how much deviation from the intended color there can be.
+
+slowness
+	(greater or equal to 0)
+		this tells you how slow the color changes
+
+
+
+
+
+END OF COMMENT§
+maxSize = 15
+rectanglesPerCycle = 100
+colorVariance = 23
+slowness = 0
