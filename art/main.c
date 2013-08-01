@@ -61,7 +61,7 @@ int diff[3] = {0,0,0};
 //0=red, 1=green, 2=blue
 int bigDiff = 0;
 int diffDone = 0;
-int afterCorrection[3];
+int afterCorrection[3] = {1,1,1};
 
 
 #include "functions.h"
@@ -215,7 +215,12 @@ int main(int argc, char *argv[])
 				long r,g,b;
 				#if debug
 				char rc,gc,bc;
-				#endif // debug
+				
+				//calculate the r,g, and b values
+				if(bigDiff == 0) r = afterCorrection[bigDiff]*(diffDone);
+				else if(bigDiff == 1) g = afterCorrection[bigDiff]*(diffDone);
+				else if(bigDiff == 2) b = afterCorrection[bigDiff]*(diffDone);
+				#endif //debug
 				
 				printColor = color[0] + afterCorrection[bigDiff]*mult[bigDiff]*(diffDone++);
 				
@@ -232,13 +237,10 @@ int main(int argc, char *argv[])
 					printColor += b;
 				}
 				#if debug
-				if(r<0) rc = '-'; else rc = ' ';
-				if(g<0) gc = '-'; else gc = ' ';
-				if(b<0) bc = '-'; else bc = ' ';
-				printf("r = %c%2x\t", rc, r);
-				printf("g = %c%2x\t", gc, g);
-				printf("b = %c%2x\t", bc, b);
-				printf("printColor = %6x\t\tdiffDone = %2x\n", printColor, diffDone);
+				printf("r = %4d\t", r);
+				printf("g = %4d\t", g);
+				printf("b = %4d\t", b);
+				printf("printColor = %6.6x\t\tdiffDone = %2x\n", printColor, diffDone);
 				#endif // debug
 			}
     	}
