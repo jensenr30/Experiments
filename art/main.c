@@ -16,12 +16,12 @@
 
 #include <Windows.h>
 
-typedef char bool;
+#define bool char
 #define false 0
 #define true  1
 
 //do i really want to debug?
-const bool debug = false;
+#define debug true
 
 //The attributes of the screen 
 int SCREEN_WIDTH = 948;
@@ -46,8 +46,9 @@ int colorVar = 24;
 //this is how slow the game goes
 int slowness = 2;
 
-//color[0] is the last color, color[1] is the current color, color[2] is the next color
-int color[3] = {0xffffff, 0xffffff, 0xffffff};
+//color[0] is the previous color. color[2] is the next color
+int color[3] = {0,0}; //= {0xffffff, 0xffffff};
+
 //this holds the value that will be printed in the rectangles
 int printColor;
 
@@ -55,7 +56,7 @@ int printColor;
 //diff[0] = red diff
 //diff[1] = green diff
 //diff[2] = blue diff
-int diff[3];
+int diff[3] = {0,0,0};
 //used to keep track of which of the three colors have the biggest diff.
 //0=red, 1=green, 2=blue
 int bigDiff = 0;
@@ -68,7 +69,7 @@ SDL_Rect myrect;
 
 int main(int argc, char *argv[])
 {
-	int cycle = 0;
+	int i;
 	int mult[3] = {0x10000, 0x100, 0x1};
 	unsigned long randomtimes;
 	
@@ -88,6 +89,7 @@ int main(int argc, char *argv[])
     
 	//make sure the program waits for a quit
 	bool quit = false;
+    
     
     //While the user hasn't quit
     while( quit == false )
@@ -121,12 +123,14 @@ int main(int argc, char *argv[])
 			//If space a key was pressed
 			else if( event.type == SDL_KEYDOWN )
 			{
-				//nothing
+				//if the user presses anything, reload the settings.
+				load_settings();
 			}
 			//If a mouse button was pressed
 			else if( event.type == SDL_MOUSEBUTTONDOWN )
 			{
-				//nothing
+				//if the user presses anything, reload the settings.
+				load_settings();
 			}
 			else if( event.type == SDL_MOUSEBUTTONUP )
 			{
@@ -140,11 +144,17 @@ int main(int argc, char *argv[])
     	} // end while(poll event)
     	
     	//if you have reached the target color
-    	if(color[0] == color[2] && cycle==0){
+    	if(diffDone == afterCorrection[bigDiff]*diff[bigDiff]){
+			/* old color code
 			color[1] = color[0] =  rand()%0x100;
 			color[1]+= color[0]+= (rand()%0x100)*0x100;
 			color[1]+= color[0]+= (rand()%0x100)*0x10000; 
+			*/
 			
+			//put the previous new color into the current color (start where the last color cycle began)
+			color[0] = color[2];
+			
+			//get a new random color
 			color[2] =  rand()%0x100;
 			color[2]+= (rand()%0x100)*0x100;
 			color[2]+= (rand()%0x100)*0x10000;
@@ -182,17 +192,32 @@ int main(int argc, char *argv[])
 			//reset the done diffs cycles
 			diffDone = 0;
 			#if debug
-			printf("\n\n\ncolor[0] = %6x\ncolor[2] = %6x\n\ndiff[0] = %2d\ndiff[1] = %2d\ndiff[2] = %2d\n\n", color[0], color[2], diff[0], diff[1], diff[2]);
+			printf("\n\n\ncolor[0] = %6x\ncolor[2] = %6x\n\n", color[0], color[2]);
+			for(i=0; i<3; i++){
+				printf("diff[%d] = ",i);
+				if(diff[i] < 0) printf("-");
+				else printf(" ");
+				printf("%2x\n",diff[i]*afterCorrection[i]);
+			}
+			printf("\nbigDiff = %d\n", bigDiff);
+			printf("diff[bigDiff] = ");
+			if(diff[bigDiff]<0) printf("-");
+			else printf(" ");
+			printf("%2.2x\n", diff[bigDiff]*afterCorrection[bigDiff]);
+			printf("diffDone = %d\n\n", diffDone);
 			#endif
     	}
     	else{
-			if(diffDone == afterCorrection[bigDiff]*diff[bigDiff] && cycle==0){
+			if(diffDone == afterCorrection[bigDiff]*diff[bigDiff]){
 				color[0] = color[2]; // if you have reached the end, then you are done. find a new color to persue and go forward from there.
 			}
 			else{
-				int r,g,b;
+				long r,g,b;
+				#if debug
+				char rc,gc,bc;
+				#endif // debug
 				
-				printColor = color[1] + afterCorrection[bigDiff]*mult[bigDiff]*(diffDone++);
+				printColor = color[0] + afterCorrection[bigDiff]*mult[bigDiff]*(diffDone++);
 				
 				if(bigDiff != 0){ // red
 					r = (diff[0]*diffDone)/diff[bigDiff];
@@ -207,8 +232,14 @@ int main(int argc, char *argv[])
 					printColor += b;
 				}
 				#if debug
-				printf("color[1] = %6x\n", color[1]);
-				#endif
+				if(r<0) rc = '-'; else rc = ' ';
+				if(g<0) gc = '-'; else gc = ' ';
+				if(b<0) bc = '-'; else bc = ' ';
+				printf("r = %c%2x\t", rc, r);
+				printf("g = %c%2x\t", gc, g);
+				printf("b = %c%2x\t", bc, b);
+				printf("printColor = %6x\t\tdiffDone = %2x\n", printColor, diffDone);
+				#endif // debug
 			}
     	}
     	
@@ -216,11 +247,6 @@ int main(int argc, char *argv[])
     	
     	int i;
     	for(i=0; i<rectanglesPerCycle; i++){
-			/* old color generation
-			color =  rand()%0x100;
-			color+= (rand()%0x100)*0x100;
-			color+= (rand()%0x100)*0x10000;
-			*/
 			myrect.x = rand()%SCREEN_WIDTH;
 			myrect.y = rand()%SCREEN_HEIGHT;
 			
@@ -228,14 +254,13 @@ int main(int argc, char *argv[])
 			myrect.w = rand()%maxSize; 
 			
 			SDL_FillRect(screen, &myrect, printColor);
-			
 		}
     	
     	
     	SDL_Flip(screen);
-    	cycle++;
-    	if(cycle>slowness) cycle = 0;
-    	Sleep(1);
+    	
+    	if(slowness)
+			Sleep(slowness);
     }
     
     

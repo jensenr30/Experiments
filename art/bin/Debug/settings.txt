@@ -14,14 +14,14 @@ colorVariance
 
 slowness
 	(greater or equal to 0)
-		this tells you how slow the color changes
+		the amount of time (in milliseconds) that the program will delay on each itteration.
 
 
 
 
 
 END OF COMMENT§
-maxSize = 15
-rectanglesPerCycle = 100
+maxSize = 50
+rectanglesPerCycle = 4
 colorVariance = 23
 slowness = 0
