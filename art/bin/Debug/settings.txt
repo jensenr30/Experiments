@@ -17,7 +17,8 @@ slowness
 		the amount of time (in milliseconds) that the program will delay on each itteration.
 
 
-
+	TO APPLY ANY CHANGES YOU'VE MADE TO THE SETTINGS, simply save this file and click on the RUNNING Art.exe program.
+	You do NOT need to restart the program to apply your changes.
 
 
 END OF COMMENT§
