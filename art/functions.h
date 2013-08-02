@@ -133,6 +133,36 @@ int load_settings(){
 }
 
 
+///pop pop
+//send this function an array of integers (positive or negative) and this function will determine the biggest one.
+//this functions returns a number that can index into the array to find the largest number.
+//returns -1 if something went wrong.
+int magnitude(int *numbers, int elements){
+	int i=1; // the current index
+	int ibig=0; // index to the biggest so far
+	//the multiplier for the current index.
+	int imult=1;
+	int ibigmult=1;
+	//if there are 0 or negative elements, quit and return
+	if(elements < 1) return -1;
+	if(elements == 1) return 0;
+	
+	//if we are here, we know that there must be at least 2 elements in the array.
+	for(ibig=0,i=1; i<elements; i++){
+		if(numbers[i] < 0) imult = -1; else imult = 1;
+		if(numbers[ibig] < 0) ibigmult = -1; else ibigmult = 1;
+		//if the current number is bigger in MAGNITUDE than the biggest one found so far...
+		if(numbers[i]*imult >= numbers[ibig]*ibigmult)
+			//...then record the biggest one as the current one.
+			ibig = i;
+	}
+	return ibig;
+}
+
+
+
+
+
 
 
 

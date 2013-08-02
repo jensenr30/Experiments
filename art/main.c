@@ -46,31 +46,38 @@ int colorVar = 24;
 //this is how slow the game goes
 int slowness = 2;
 
-//color[0] is the previous color. color[2] is the next color
+//color[0] is the previous color. color[1] is the current color. color[2] is the next color
 int color[3] = {0,0}; //= {0xffffff, 0xffffff};
-
-//this holds the value that will be printed in the rectangles
-int printColor;
+//this is used to keep track of specific color components
+SDL_Color clr[3];
 
 //the difference between each rgb part of color[0] and color[2].
 //diff[0] = red diff
 //diff[1] = green diff
 //diff[2] = blue diff
 int diff[3] = {0,0,0};
-//used to keep track of which of the three colors have the biggest diff.
-//0=red, 1=green, 2=blue
-int bigDiff = 0;
-int diffDone = 0;
-int afterCorrection[3] = {1,1,1};
 
+//this is a number either 0, 1, or 2 that can index into the diff array. it tells you which one has the largest magnitude.
+short bigD = 0;
+//this is how many itter you have gone 
+int itter = 0;
 
+//general functions
 #include "functions.h"
+
+// general purpose rectangle
 SDL_Rect myrect;
 
 int main(int argc, char *argv[])
 {
 	int i;
-	int mult[3] = {0x10000, 0x100, 0x1};
+	
+	int negmult[3];
+	#if debug
+	char negchar[3];
+	#endif // debug
+	
+	//int mult[3] = {0x10000, 0x100, 0x1};
 	unsigned long randomtimes;
 	
 	srand(time(NULL));
@@ -144,105 +151,84 @@ int main(int argc, char *argv[])
     	} // end while(poll event)
     	
     	//if you have reached the target color
-    	if(diffDone == afterCorrection[bigDiff]*diff[bigDiff]){
-			/* old color code
-			color[1] = color[0] =  rand()%0x100;
-			color[1]+= color[0]+= (rand()%0x100)*0x100;
-			color[1]+= color[0]+= (rand()%0x100)*0x10000; 
-			*/
-			
-			//put the previous new color into the current color (start where the last color cycle began)
+    	if(itter == negmult[bigD]*diff[bigD]){
+    		//set color[0] to color[2].
 			color[0] = color[2];
+			//randomize next color
+			color[2] = (rand()%0x100)*0x10000 + (rand()%0x100)*0x100 + rand()%0x100;
 			
-			//get a new random color
-			color[2] =  rand()%0x100;
-			color[2]+= (rand()%0x100)*0x100;
-			color[2]+= (rand()%0x100)*0x10000;
+			//used to index into the diff array.
+			int r=0,g=1,b=2;
+			//generate color component differences.
+			diff[r] =  color[2]/0x10000 - color[0]/0x10000;
+			diff[g] = (color[2]%0x10000)/0x100 - (color[0]%0x10000)/0x100;
+			diff[b] =  color[2]%0x100 - color[0]%0x100;
 			
-			//calculate the diffs
-			diff[0] = color[2]/0x10000 - color[0]/0x10000;
-			diff[1] = ((color[2]/0x100)-(color[2]/0x10000)*0x100) - ((color[0]/0x100)-(color[0]/0x10000)*0x100);
-			diff[2] = color[2]%0x100 - color[0]%0x100;
-			if(diff[0]<0){ diff[0] *= -1; afterCorrection[0] = -1; } else afterCorrection[0] = 1;
-			if(diff[1]<0){ diff[1] *= -1; afterCorrection[1] = -1; } else afterCorrection[1] = 1;
-			if(diff[2]<0){ diff[2] *= -1; afterCorrection[2] = -1; } else afterCorrection[2] = 1;
+			//find out which of the three differences are the most sever in magnitude
+			bigD = magnitude(diff, 3);
+			itter = 0;
 			
-			//find the biggest difference in color components.
-			//red greater than green
-			if(diff[0] > diff[1]){
-				//red greater than blue
-				if(diff[0] > diff[2])
-					bigDiff = 0; // red is biggest diff
-				else
-					bigDiff = 2; // blue is biggest diff
-			}
-			else{
-				// green greater than red
-				if(diff[1] > diff[2])
-					bigDiff = 1; // green is biggest diff
-				else
-					bigDiff = 2; // blue is biggest diff
-			}
-			
-			//revert the diffs.
-			diff[0] *= afterCorrection[0];
-			diff[1] *= afterCorrection[1];
-			diff[2] *= afterCorrection[2];
-			
-			//reset the done diffs cycles
-			diffDone = 0;
-			#if debug
-			printf("\n\n\ncolor[0] = %6x\ncolor[2] = %6x\n\n", color[0], color[2]);
+			#if debug//generate negmults and negchars
 			for(i=0; i<3; i++){
-				printf("diff[%d] = ",i);
-				if(diff[i] < 0) printf("-");
-				else printf(" ");
-				printf("%2x\n",diff[i]*afterCorrection[i]);
+				if(diff[i] <0){
+					negchar[i] = '-';
+					negmult[i] = -1;
+				}
+				else{
+					negchar[i] = ' ';
+					negmult[i] = 1;
+				}
 			}
-			printf("\nbigDiff = %d\n", bigDiff);
-			printf("diff[bigDiff] = ");
-			if(diff[bigDiff]<0) printf("-");
-			else printf(" ");
-			printf("%2.2x\n", diff[bigDiff]*afterCorrection[bigDiff]);
-			printf("diffDone = %d\n\n", diffDone);
-			#endif
+			#else //generate negmults
+			for(i=0; i<3; i++){
+				if(diff[i] <0){
+					negmult[i] = -1;
+				}
+				else{
+					negmult[i] = 1;
+				}
+			}
+			#endif // debug
+			
+			
+			//print debugging info
+			#if debug
+			//print colors [0] and [2]
+			printf("\n\nstarting:  color[0] = %6.6x\n", color[0]);
+			printf("target:    color[2] = %6.6x\n", color[2]);
+			
+			//print diffs
+			for(i=0; i<3; i++) printf("\ndiff[%d] = %c%2.2x\n", i, negchar[i], diff[i]*negmult[i]);
+			printf("\n");
+			#endif // debug
+			
+			//get components of the previous color (color[0])
+			clr[0].r = (color[0]%0x1000000) / 0x10000;
+			clr[0].g = (color[0]%0x10000  ) /   0x100;
+			clr[0].b = (color[0]%0x100    ) /     0x1;
+			//get components of the new color (color[2])
+			clr[2].r = (color[2]%0x1000000) / 0x10000;
+			clr[2].g = (color[2]%0x10000  ) /   0x100;
+			clr[2].b = (color[2]%0x100    ) /     0x1;
     	}
+    	//if you are still trying to get to the target color
     	else{
-			if(diffDone == afterCorrection[bigDiff]*diff[bigDiff]){
-				color[0] = color[2]; // if you have reached the end, then you are done. find a new color to persue and go forward from there.
-			}
-			else{
-				long r,g,b;
-				#if debug
-				char rc,gc,bc;
-				
-				//calculate the r,g, and b values
-				if(bigDiff == 0) r = afterCorrection[bigDiff]*(diffDone);
-				else if(bigDiff == 1) g = afterCorrection[bigDiff]*(diffDone);
-				else if(bigDiff == 2) b = afterCorrection[bigDiff]*(diffDone);
-				#endif //debug
-				
-				printColor = color[0] + afterCorrection[bigDiff]*mult[bigDiff]*(diffDone++);
-				
-				if(bigDiff != 0){ // red
-					r = (diff[0]*diffDone)/diff[bigDiff];
-					printColor += r*0x10000;
-				}
-				else if(bigDiff != 1){ // green
-					g = (diff[1]*diffDone)/diff[bigDiff];
-					printColor += g*0x100;
-				}
-				else if(bigDiff != 2){ // blue
-					b = (diff[2]*diffDone)/diff[bigDiff];
-					printColor += b;
-				}
-				#if debug
-				printf("r = %4d\t", r);
-				printf("g = %4d\t", g);
-				printf("b = %4d\t", b);
-				printf("printColor = %6.6x\t\tdiffDone = %2x\n", printColor, diffDone);
-				#endif // debug
-			}
+			int r=0,g=1,b=2;
+			
+			//generate current color (color[1])
+			clr[1].r = negmult[r]*(  (itter)*clr[2].r + (negmult[r]*diff[bigD] - itter)*clr[0].r  ) / diff[bigD];
+			clr[1].g = negmult[g]*(  (itter)*clr[2].g + (negmult[g]*diff[bigD] - itter)*clr[0].g  ) / diff[bigD];
+			clr[1].b = negmult[b]*(  (itter)*clr[2].b + (negmult[b]*diff[bigD] - itter)*clr[0].b  ) / diff[bigD];
+			
+			//put current color into color[1]
+			color[1] = clr[1].r*0x10000
+					 + clr[1].g*0x100
+					 + clr[1].b*0x1;
+			itter++;
+			#if debug
+			for(i=1; i<2; i++)printf("clr[%d].r= %2.2x  clr[%d].g= %2.2x  clr[%d].b= %2.2x\n", i, clr[i].r, i, clr[i].g, i, clr[i].b);
+			//printf("\n");
+			#endif // debug
     	}
     	
     	
@@ -255,7 +241,7 @@ int main(int argc, char *argv[])
 			myrect.h = rand()%maxSize;
 			myrect.w = rand()%maxSize; 
 			
-			SDL_FillRect(screen, &myrect, printColor);
+			SDL_FillRect(screen, &myrect, color[1]);
 		}
     	
     	

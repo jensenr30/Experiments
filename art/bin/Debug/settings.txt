@@ -24,4 +24,4 @@ END OF COMMENT§
 maxSize = 512
 rectanglesPerCycle = 16
 colorVariance = 23
-slowness = 15
+slowness = 7
