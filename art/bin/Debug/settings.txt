@@ -1,7 +1,7 @@
 these are the initial comments.
 
 maxSize
-	(greater or equal to 1)
+	(greater or equal to 2)
 		it is the max size of the rectangles printed to the screen.
 
 rectanglesPerCycle
@@ -21,7 +21,7 @@ slowness
 
 
 END OF COMMENT§
-maxSize = 512
-rectanglesPerCycle = 16
+maxSize = 12
+rectanglesPerCycle = 70
 colorVariance = 23
-slowness = 7
+slowness = 5

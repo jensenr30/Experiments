@@ -21,7 +21,7 @@
 #define true  1
 
 //do i really want to debug?
-#define debug true
+#define debug 0
 
 //The attributes of the screen 
 int SCREEN_WIDTH = 948;
@@ -213,12 +213,10 @@ int main(int argc, char *argv[])
     	}
     	//if you are still trying to get to the target color
     	else{
-			int r=0,g=1,b=2;
-			
 			//generate current color (color[1])
-			clr[1].r = negmult[r]*(  (itter)*clr[2].r + (negmult[r]*diff[bigD] - itter)*clr[0].r  ) / diff[bigD];
-			clr[1].g = negmult[g]*(  (itter)*clr[2].g + (negmult[g]*diff[bigD] - itter)*clr[0].g  ) / diff[bigD];
-			clr[1].b = negmult[b]*(  (itter)*clr[2].b + (negmult[b]*diff[bigD] - itter)*clr[0].b  ) / diff[bigD];
+			clr[1].r = negmult[bigD]*(  (itter)*clr[2].r + (negmult[bigD]*diff[bigD] - itter)*clr[0].r  ) / diff[bigD];
+			clr[1].g = negmult[bigD]*(  (itter)*clr[2].g + (negmult[bigD]*diff[bigD] - itter)*clr[0].g  ) / diff[bigD];
+			clr[1].b = negmult[bigD]*(  (itter)*clr[2].b + (negmult[bigD]*diff[bigD] - itter)*clr[0].b  ) / diff[bigD];
 			
 			//put current color into color[1]
 			color[1] = clr[1].r*0x10000
