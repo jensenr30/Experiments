@@ -22,7 +22,7 @@ slowness
 
 
 END OF COMMENT§
-maxSize = 12
-rectanglesPerCycle = 70
+maxSize = 28
+rectanglesPerCycle = 65
 colorVariance = 23
-slowness = 5
+slowness = 3
