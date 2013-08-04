@@ -1,0 +1,7 @@
+make the program NOT case sensitive
+
+make a whitelist for accepted word characters instead of a blacklist for non-word characters.
+
+compile the results into a single txt document.
+
+add graphical analysis of the results
