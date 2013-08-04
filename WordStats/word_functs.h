@@ -40,8 +40,25 @@ FILE *choose_file(){
 
 	if(GetOpenFileName(&ofn))
 	{
-		printf("Analyzing %s", szFileName);
+		printf("Analyzing %s\n", szFileName);
 	    return fopen(szFileName, "r");
 	}
 	else return NULL;
 }
+
+
+///returns true if there is at least 1 lowercase letter.
+///returns false otherwise.
+bool has_some_lowercase_letter(char *inputstr){
+	int length = strlen(inputstr);
+	int i;
+	for(i=0; i<length; i++){
+		if(inputstr[i] >= 'a' && inputstr[i] <= 'z') return true;
+	}
+	return false;
+}
+
+
+
+
+

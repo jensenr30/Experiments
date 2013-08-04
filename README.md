@@ -19,3 +19,9 @@ revised/optimized	^
 
 *JP*
 - ADD YOUR CONTACT INFO JP!
+
+Important Linker Settings:
+
+-lcomdlg32
+-lmingw32
+-lSDLmain -lSDL -lSDL_image
