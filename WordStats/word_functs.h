@@ -1,20 +1,30 @@
 #define WORD_FILES_PATH "words\\"
 // I don't think most words are going to be longer than 512 characters :P
 #define MAX_WORD_LENGTH 64
+//the maximum number of relationships that a word can have (the number of different words that it can point to.
+#define MAX_WORD_RELATIONSHIPS 10000
+//maximum number of unique words
+#define MAX_UNIQUE_WORDS 1000
 
+//used for storing data on words.
 struct wordData {
 	//how many times has this word been found?
 	unsigned short occurances;
 	char wordName[MAX_WORD_LENGTH];
-};
+	
+	struct wordData *nextWords[MAX_WORD_RELATIONSHIPS];
+} myWordData[MAX_UNIQUE_WORDS];
 
 /// returns true or false whether the input char is an acceptable word-type character.
-bool isValidWordChar( char inputChar ){
-	if(        (inputChar >= 'A' &&inputChar <= 'Z')	// uppercase letters
-			|| (inputChar >= 'a' &&inputChar <= 'z')	// lowercase letters
-			|| (inputChar >= '0' &&inputChar <= '9')	// numbers
-			||  inputChar == '-'						// dashes for hyphonated words
-			||  inputChar == '_'						// underscores for analyzing programming stylized documents
+bool isValidWordChar( unsigned char inputChar ){
+	if(       (inputChar >= 'A' &&inputChar <= 'Z')	// uppercase letters
+			||(inputChar >= 'a' &&inputChar <= 'z')	// lowercase letters
+			||(inputChar >= '0' &&inputChar <= '9')	// numbers
+			|| inputChar == '-'						// dashes for hyphonated words
+			|| inputChar == '_'						// underscores for analyzing programming stylized documents
+			|| inputChar == '\''					// apostrophes for contractions
+			|| inputChar == 145						// right apostrophe
+			|| inputChar == 146 					// left  apostrophe
 	){
 		return true; // valid character, return true
 	}

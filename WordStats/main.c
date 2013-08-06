@@ -67,7 +67,7 @@ int main(void){
 				j=0;
 				while(3){
 					temporaryStorage = fgetc(document); // advance character
-					freq[temporaryStorage]++; // increment this character's frequency (we don't want our results to be fraudulant!  :S
+					freq[(unsigned char)temporaryStorage]++; // increment this character's frequency (we don't want our results to be fraudulant!  :S
 					if(temporaryStorage == false)// if you find the end of the word...
 						break; // stop advancing characters. You have found the end of the current word.
 					j++;
@@ -77,11 +77,11 @@ int main(void){
 			
 			
 			words[0][i] = fgetc(document); //get character from the document.
-			freq[(int)words[0][i]]++; // increment this character's frequency.
+			freq[(unsigned char)words[0][i]]++; // increment this character's frequency.
 			charactersAnalyzed++; // increment the number of characters analyzed
 			
 			//if the character input was a valid word-character
-			if(isValidWordChar(words[0][i])){
+			if(isValidWordChar((unsigned char)words[0][i])){
 				//if the character is uppercase
 				if(words[0][i]>='A'&&words[0][i]<='Z')
 					// make it lowercase (by adding 32)
