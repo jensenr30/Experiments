@@ -10,12 +10,10 @@
 
 #define debug 1
 
-// I don't think most words are going to be longer than 512 characters :P
-#define MAX_WORD_LENGTH 512
 
 #include "word_functs.h"
 int main(void){
-	int i;
+	int i,j;
 	printf("Choose a file to analyze...\n");
 	//load the document to analyze
 	FILE *document = choose_file();
@@ -34,6 +32,8 @@ int main(void){
 	if(debugFile == NULL) printf("Couldn't open debug.txt file.\n");
 	#endif
 	
+	
+	
 	//these are two arrays to hold the current word and the previous word that the program analyzed.
 	//words[0][] = current word
 	//words[1][] = previous word
@@ -48,109 +48,80 @@ int main(void){
 	
 	time_t startTime = time(NULL);
 	i=0;
+	char temporaryStorage;
+	
+	//main word loop
 	while(1){
-		//get character from the document.
-		words[0][i] = fgetc(document);
-		freq[(int)words[0][i]]++; // increment this character's frequency.
-		charactersAnalyzed++; // increment the number of characters analyzed
 		
-		//if the character input was a valid word-character
-		if(    (words[0][i]>='A'&&words[0][i]<='Z') // uppercase letters
-			|| (words[0][i]>='a'&&words[0][i]<='z') // lowercase letters
-			|| (words[0][i]>='0'&&words[0][i]<='9') // numbers
-			|| words[0][i] == '-'
-			|| words[0][i] == '_'){
-					
-			//if the character is uppercase
-			if(words[0][i]>='A'&&words[0][i]<='Z')
-				// make it lowercase (by adding 32)
-				words[0][i]+= 0x20;
+		
+		//get a word from file
+		i=0; // reset index.
+		while(2){
 			
-			//increment index
-			i++;
-		}
-		else{
-			//end the word
-			words[0][i] = '\0';
-			//if this word is at least a character long and it has at least one alphabetic letter (a-z)
-			if(i>0 && has_some_lowercase_letter(words[0])){
-				//if the previous word is valid
-				if(words[1][0] != '\0')
-					//add relationship
-					add_word_relationship(words[0], words[1]);
-				//increment words analyzed
-				wordsAnalyzed++;
-				#if debug
-				fprintf(debugFile, "%6.6d %s\n", wordsAnalyzed, words[0]);
-				#endif // debug
-				//copy the current word into the last word.
-				strcpy(words[1], words[0]);
-				//reset index.
-				i=0;
+			//if you have run out of space in words[0][], then get to the end of the word and move on to the next one
+			if(i>=MAX_WORD_LENGTH){
+				//end the current word
+				words[0][MAX_WORD_LENGTH-1] = '\0'; // end the word
+				
+				//move to the next word
+				j=0;
+				while(3){
+					temporaryStorage = fgetc(document); // advance character
+					freq[temporaryStorage]++; // increment this character's frequency (we don't want our results to be fraudulant!  :S
+					if(temporaryStorage == false)// if you find the end of the word...
+						break; // stop advancing characters. You have found the end of the current word.
+					j++;
+				}
+				break; // stop inputting the current word.
 			}
-			//if you reached the end of the document stop reading in the document
-			if(feof(document)) break;
+			
+			
+			words[0][i] = fgetc(document); //get character from the document.
+			freq[(int)words[0][i]]++; // increment this character's frequency.
+			charactersAnalyzed++; // increment the number of characters analyzed
+			
+			//if the character input was a valid word-character
+			if(isValidWordChar(words[0][i])){
+				//if the character is uppercase
+				if(words[0][i]>='A'&&words[0][i]<='Z')
+					// make it lowercase (by adding 32)
+					words[0][i]+= 0x20;
+				//increment index
+				i++;
+			}
+			else{
+				break; // if the character you input is invalid, stop inputting the word.
+			}
 		}
+		
+		
+		//if you have reached this point, that means that you are going to end the word, crunch some data, and then get memory ready to input another word.
+		//end the word
+		words[0][i] = '\0';
+		//if this word is at least a character long and it has at least one alphabetic letter (a-z)
+		if(i>0 && has_some_lowercase_letter(words[0])){
+			//if the previous word is valid
+			if(words[1][0] != '\0')
+				//add relationship
+				add_word_relationship(words[0], words[1]);
+			//increment words analyzed
+			wordsAnalyzed++;
+			#if debug
+			fprintf(debugFile, "%6.6d %s\n", wordsAnalyzed, words[0]);
+			#endif // debug
+			//copy the current word into the last word.
+			strcpy(words[1], words[0]);
+		}
+		//if you reached the end of the document stop reading in the document
+		if(feof(document)) break;
 	}
 	
 	//calculate time it took.
 	time_t executionTime = difftime(time(NULL), startTime);
 	if(executionTime<1)executionTime = 1; // this solves the divide by zero errors
 	
-	///old loop
-	/*
-	//go through the document and collect word data.
-	while(1){
 	
-		words[0][i] = fgetc(document); // input a single character
-		if(feof(document)) break;
-		
-		//check to see if there is a non-word character being read
-		for(j=0;j<totalNonWordChars; j++){
-			if(words[0][i] == nonWordChars[j]){ // if you encounter a non-word character, you have reached the end of the word.
-				//if there are no valid characters in the word yet
-				if(i==0){
-					//don't treat this as the end of a word. just skip over it.
-					words[0][0] = '\0';
-					startedNewWord = true;
-					break;
-				}
-				// set current character to end of string.
-				words[0][i] = '\0';
-				// as long as this isn't the first word being analyzed
-				if(wordsAnalyzed>0)
-					// add the relationship that the previous word is followed by the current one.
-					add_word_relationship(words[0], words[1]);
-				
-				wordsAnalyzed++;
-				
-				#if debug
-				//only if the word is valid, print it to the debug file.
-				if(words[0][0] != '\0'){
-					fprintf(debugFile, "%7d - %s\n", wordsAnalyzed, words[0]);
-				}
-				#endif
-				
-				//move the current word (words[0]) into the previous word (words[1])
-				strcpy(words[1], words[0]);
-				//blank the current word
-				words[0][0] = '\0';
-				
-				//we have started a new word.
-				startedNewWord = true;
-				break;
-			}
-		}
-		// reset index if we are starting on a new word
-		if(startedNewWord == true){
-			i=0;
-			startedNewWord = false;
-		}
-		// increment index if we are going to keep working on our current word
-		else i++;
-		
-	}
-	*/
+	
 	
 	printf("\nFinished analyzing document.\nAnalysis took %d seconds.\nAnalyzed %d words.\nAnalyzed %lu characters.\n\n", (int)executionTime, wordsAnalyzed, charactersAnalyzed);
 	float averageWordLength = ((float)charactersAnalyzed)/((float)wordsAnalyzed);
