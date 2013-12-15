@@ -27,9 +27,9 @@ thrusterAccel: 0.0005 by default
 	in different values for it and see what happens.
 
 ********************************* last line of of comments. begin data after double-S ***********§
-SCREEN_WIDTH: 1000
-SCREEN_HEIGHT: 600
-reflecSpeedMod: 0.50
+SCREEN_WIDTH: 400
+SCREEN_HEIGHT: 300
+reflecSpeedMod: 1.0
 reflecSpeedCutOff: 0.07
-thrusterAccel: 0.0005
+thrusterAccel: 0.008
 ******************** everything after the thrusterAccel line is a comment. **************************************************

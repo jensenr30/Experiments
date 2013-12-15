@@ -20,9 +20,10 @@ int number_of_used_charges;
 
 typedef int bool;
 
-//The attributes of the screen
-int SCREEN_WIDTH = 1067;
-int SCREEN_HEIGHT = 600;
+//The attributes of the screen.
+/// these values are loaded from the config file.
+int SCREEN_WIDTH;
+int SCREEN_HEIGHT;
 int SCREEN_BPP = 32;
 
 //The surfaces that will be used
@@ -47,6 +48,13 @@ short int paused = 0;
 double time_el = 0.00;
 //this is how much time each increment is.
 double time_inc = 0.0005; // one millisecond of game
+
+#define TRAIL_LENGTH 30000
+#define TRAIL_COLOR 0xff00ff00
+#define TRAIL_POINTS_TO_SKIP 2
+// this holds the trail that the glider leaves behind it.
+int trail[TRAIL_LENGTH][2];
+int trailIndex = 0;
 
 float posx = 50;
 float posy = 50;
@@ -81,6 +89,11 @@ void frame( int );
 
 int main( int argc, char* args[] )
 {
+	// these keep track of the previous last posx and last posy
+	int lastposx;
+	int lastposy;
+	// this keeps track of how many trail points have been seen (and when it reaches TRAIL_POINTS_TO_SKIP, it will record that trail point)
+	int trailPointsFound = TRAIL_POINTS_TO_SKIP;
 	
 	
     //Initialize
@@ -213,10 +226,26 @@ int main( int argc, char* args[] )
     	
     	thrust(keyUp, keyLeft, keyDown, keyRight);
     	
+    	// if the posx is inside of a new pixel
+    	if(lastposx != (int)posx || lastposy != (int)posy){
+			trailPointsFound++;
+			if(trailPointsFound >= TRAIL_POINTS_TO_SKIP){
+				trailPointsFound = 0;
+				trail[trailIndex][0] = (int)posx;
+				trail[trailIndex][1] = (int)posy;
+				trailIndex++;
+				if(trailIndex >= TRAIL_LENGTH) trailIndex = 0;
+			}
+    	}
+		// save last pos variables
+		lastposx = (int)posx;
+		lastposy = (int)posy;
     	
     	
     	if( paused == 0)
     		frame(1);
+		
+		
     }
     
     
@@ -240,6 +269,7 @@ void frame( int itterations )
 		move_glider();
 		check_glider();
 		blit_background();
+		blit_trail();
 		blit_glider();
 		SDL_Flip(screen);
 		return;

@@ -30,11 +30,15 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add directory="C:/Program Files (x86)/CodeBlocks/freeglut/include" />
 		</Compiler>
-		<Unit filename="LOpenGL.h" />
-		<Unit filename="LUtil.cpp" />
-		<Unit filename="LUtil.h" />
-		<Unit filename="main.cpp" />
+		<Linker>
+			<Add option="-lOpenGL32 -lglu32 -lfreeglut" />
+			<Add directory="C:/Program Files (x86)/CodeBlocks/freeglut/lib" />
+		</Linker>
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<envvars />
