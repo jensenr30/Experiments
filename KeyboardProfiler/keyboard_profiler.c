@@ -99,7 +99,7 @@ short keyprof_save_stats(unsigned long long int *keyData, unsigned long long int
 	fprintf(saveFile, "\n\nWord Length\tFrequency\n");
 	// write the word length frequency data to file
 	int l;
-	for(l=1; l<KEYPROF_WORD_LENGTH_MAX; l++){
+	for(l=1; l<KEYPROF_WORD_LENGTH_MAX+1; l++){
 		fprintf(saveFile, "%d\t%lu\n", l, wordLength[l]);
 	}
 	
