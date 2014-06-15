@@ -99,7 +99,7 @@ short keyprof_save_stats(unsigned long long int *keyData, unsigned long long int
 	fprintf(saveFile, "\n\nWord Length\tFrequency\n");
 	// write the word length frequency data to file
 	int l;
-	for(l=1; l<KEYPROF_WORD_LENGTH_MAX+1; l++){
+	for(l=1; l<KEYPROF_WORD_LENGTH_MAX; l++){
 		fprintf(saveFile, "%d\t%lu\n", l, wordLength[l]);
 	}
 	
@@ -162,7 +162,7 @@ short keyprof_load_stats(char *filePath, unsigned long long int *keyData){
 // this will take a text file and reduce it to numbers in an array that describe how it works.
 // keyData is a pointer to an array of ULL integers that is KEYPROF_KEYS x KEYPROF_KEYS in size. this records what keys will lead to what keys.
 // keyFrequency is a pointer to an array of size KEYPROF_KEYS that record the frequency of each key.
-// wordLength is a pointer to an array of length KEYPROF_WORD_LENGTH_MAX+1 that records how many times a word has beeen found that has x number of characters in it (where x is used to index into the array)
+// wordLength is a pointer to an array of length KEYPROF_WORD_LENGTH_MAX that records how many times a word has beeen found that has x number of characters in it (where x is used to index into the array)
 // keyData, keyFrequency, and wordLength all must be valid for the function to work. If any are NULL, the program will return 1.
 // filePath is the path of the file that will be loaded and crunched (for example: "C:\Users\MyUserName\Documents\MyDoc.txt")
 // include symbols will dictate whether or not we use symbols `~-_=+[{]};:'",<.>/?
