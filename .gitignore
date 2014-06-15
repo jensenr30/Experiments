@@ -7,3 +7,7 @@
 *stderr.txt
 *stdout.txt
 *.orig
+
+KeyboardProfiler\literature\
+KeyboardProfiler\literature\*
+KeyboardProfiler\literature\*.*

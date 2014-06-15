@@ -1,22 +1,20 @@
-Number of Input Arguments =	9
+Number of Input Arguments =	3
 
 A:\Programming\Experiments\KeyboardProfiler\bin\Debug\keyprof.exe
-A:\Programming\Experiments\KeyboardProfiler\bin\Debug\Long Afternoon.txt
-A:\Programming\Experiments\KeyboardProfiler\bin\Debug\skype piecemeal storytelling.txt
-A:\Programming\Experiments\KeyboardProfiler\bin\Debug\01 - Ender's Game.txt
-A:\Programming\Experiments\KeyboardProfiler\bin\Debug\02 - Speaker for the Dead.txt
-A:\Programming\Experiments\KeyboardProfiler\bin\Debug\03 - Xenocide.txt
-A:\Programming\Experiments\KeyboardProfiler\bin\Debug\05 - Ender's Shadow.txt
-A:\Programming\Experiments\KeyboardProfiler\bin\Debug\11 - Ender in Exile.txt
-A:\Programming\Experiments\KeyboardProfiler\bin\Debug\A Warehouse Diary.txt
+-o
+testDoc.txt
 
 End of Input Arguments.
 
-Argument =	A:\Programming\Experiments\KeyboardProfiler\bin\Debug\Long Afternoon.txt
-Argument =	A:\Programming\Experiments\KeyboardProfiler\bin\Debug\skype piecemeal storytelling.txt
-Argument =	A:\Programming\Experiments\KeyboardProfiler\bin\Debug\01 - Ender's Game.txt
-Argument =	A:\Programming\Experiments\KeyboardProfiler\bin\Debug\02 - Speaker for the Dead.txt
-Argument =	A:\Programming\Experiments\KeyboardProfiler\bin\Debug\03 - Xenocide.txt
-Argument =	A:\Programming\Experiments\KeyboardProfiler\bin\Debug\05 - Ender's Shadow.txt
-Argument =	A:\Programming\Experiments\KeyboardProfiler\bin\Debug\11 - Ender in Exile.txt
-Argument =	A:\Programming\Experiments\KeyboardProfiler\bin\Debug\A Warehouse Diary.txt
+Argument =	-o
+Argument =	testDoc.txt
+Number of Input Arguments =	3
+
+A:\Programming\Experiments\KeyboardProfiler\bin\Debug\keyprof.exe
+-o
+testDoc.txt
+
+End of Input Arguments.
+
+Argument =	-o
+Argument =	testDoc.txt

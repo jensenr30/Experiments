@@ -7,10 +7,11 @@
 int keyboard_profiler(int argc, char *argv[]);
 
 #define KEYPROF_FILE_NOT_FOUND 404
-short keyprof_crunch_file(unsigned long long int *keyData, char *filePath, char includeSymbols);
+#define KEYPROF_WORD_LENGTH_MAX 40
+short keyprof_crunch_file(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *wordLength, char *filePath, char includeSymbols, char keystrokeMode);
 
 #define KEYPROF_OUTPUT_NAME_DEFAULT "key_statistics.txt"
-short keyprof_save_stats(unsigned long long int *keyData, char *filePath);
+short keyprof_save_stats(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *wordLength, char *filePath);
 short keyprof_load_stats(char *filePath, unsigned long long int *keyData);
 
 
@@ -26,12 +27,12 @@ short keyprof_load_stats(char *filePath, unsigned long long int *keyData);
 #define KEYPROF_OPT_INCLUDE_SYMBOLS			"--include-symbols"
 #define KEYPROF_OPT_INCLUDE_SYMBOLS_SHORT	"-s"
 
-#define KEYPROF_OPT_KEYSTROKE_MODE			"--keystroke_mode
-#define KEYPROF_OPT_KEYSTROKE_MODE_SHORT	"-k"
+#define KEYPROF_OPT_KEYSTROK_MODE			"--keystroke-mode"
+#define KEYPROF_OPT_KEYSTROK_MODE_SHORT		"-k"
 
 // this is a string of the valid character.
 // it is set up so that the first half is the lowercase values of each key and the second half is the uppercase values of each key.
-//char keyDataString[2*KEYPROF_KEYS] = "abcdefghijklmnopqrstuvwxyz`-=[];',./ABCDEFGHIJKLMNOPQRSTUVWXYZ~_+{}:\"<>?";
+char *keyDataString;
 
 /*
 these are the following keys that will be logged and their respective locations in keyData arrays

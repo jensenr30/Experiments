@@ -65,29 +65,33 @@ void keyprof_log_s(char *string, char *data){
 }
 
 
-
+void keyprof_init(){
+	// initialize that keyDataString
+	keyDataString = "abcdefghijklmnopqrstuvwxyz`-=[];',./ABCDEFGHIJKLMNOPQRSTUVWXYZ~_+{}:\"<>?";
+}
 
 /// this will save keyData to file
-short keyprof_save_stats(unsigned long long int *keyData, char *filePath){
+short keyprof_save_stats(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *wordLength, char *filePath){
 	
 	FILE *saveFile = fopen(filePath, "w");
 	// make sure the file was opened correctly
 	if(saveFile == NULL) return KEYPROF_FILE_NOT_FOUND;
 	
-	
+	fprintf(saveFile, "\t");
 	int f, s; // these record the character index f=first, s=second.
+	for(f=0; f<KEYPROF_KEYS; f++) fprintf(saveFile, "%c\t", keyDataString[f]);
+	fprintf(saveFile, "Next Character");
 	// f is the cause and s is the effect.
 	for(f=0; f<KEYPROF_KEYS; f++){
+		fprintf(saveFile, "\n%c\t", keyDataString[f]);
 		for(s=0; s<KEYPROF_KEYS; s++){
 			// print the data for the number of times that the user presses [f] and then [s]
 			/// TODO: figure out how to print unsigned long long
 			fprintf(saveFile, "%lu\t", (unsigned long int)keyData[f*KEYPROF_KEYS+s]);
 		}
-		// print a newline character
-		fprintf(saveFile, "\n");
 	}
-	
-	
+	// descrbe the y axis
+	fprintf(saveFile, "\nGiven Character\n");
 	
 	// close up shop when you leave
 	fclose(saveFile);
@@ -130,20 +134,34 @@ short keyprof_load_stats(char *filePath, unsigned long long int *keyData){
 }
 
 
-
-short keyprof_crunch_file(unsigned long long int *keyData, char *filePath, char includeSymbols){
+/// this will perform the statistical number crunching on the input files.
+// this will take a text file and reduce it to numbers in an array that describe how it works.
+// keyData is a pointer to an array of ULL integers that is KEYPROF_KEYS x KEYPROF_KEYS in size. this records what keys will lead to what keys.
+// keyFrequency is a pointer to an array of size KEYPROF_KEYS that record the frequency of each key.
+// wordLength is a pointer to an array of length MAX_RECORDABLE_WORD_LENGTH that records how many times a word has beeen found that has x number of characters in it (where x is used to index into the array)
+// keyData, keyFrequency, and wordLength all must be valid for the function to work. If any are NULL, the program will return 1.
+// filePath is the path of the file that will be loaded and crunched (for example: "C:\Users\MyUserName\Documents\MyDoc.txt")
+// include symbols will dictate whether or not we use symbols `~-_=+[{]};:'",<.>/?
+// keystrokeMode will count the end of words and the beginning of the next word as being related. word mode will restrict letter associations to the words they are found in.
+short keyprof_crunch_file(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *wordLength, char *filePath, char includeSymbols, char keystrokeMode){
+	
+	// make sure the pointers are all valid.
+	if(keyData == NULL || keyFrequency == NULL || wordLength == NULL) return 1;
 	
 	// attempt to open the file path
 	FILE *inputFile = fopen(filePath, "r");
 	// if the file cannot be opened, then report a FILE_NOT_FOUND error.
 	if(inputFile == NULL) return KEYPROF_FILE_NOT_FOUND;
 	
+	
+	
 	// otherwise, the file should be open and ready for business.
 	
 	// these are used to process the data from the loadFile
 	char indexCurrent;
-	char indexLast = 26; // this is initialized to 35 because it has to be something. It will only skew the data of the Backtick/Tilda key which nobody uses anyway. And it will only add a single keystroke from Backtick\Tilda key to the first character on the list.
+	char indexLast = -1; // this is initialized to -1 because there is no lastIndex when you start up the program.
 	char charInput;
+	int currentWordLength=0;
 	
 	
 	// input all characters
@@ -171,16 +189,27 @@ short keyprof_crunch_file(unsigned long long int *keyData, char *filePath, char 
 		else if( includeSymbols && (charInput == ';' || charInput == ':') ) indexCurrent = 31;
 		else if( includeSymbols && (charInput == '\''|| charInput == '"') ) indexCurrent = 32;
 		else if( includeSymbols && (charInput == ',' || charInput == '<') ) indexCurrent = 33;
-		else if( includeSymbols && (charInput == '.' || charInput == '>') ) indexCurrent = 34;	//
-		else if( includeSymbols && (charInput == '/' || charInput == '?') ) indexCurrent = 35;	//
+		else if( includeSymbols && (charInput == '.' || charInput == '>') ) indexCurrent = 34;
+		else if( includeSymbols && (charInput == '/' || charInput == '?') ) indexCurrent = 35;
 		else if(charInput == EOF) break;	// if this is the end of the file, then stop inputting data.
 		else{
-			// if no valid character was input, wait for the next valid one.
+			// if no valid character was input, that means that there is currently no word being processed.
+			// if this iteration marks the end of a word,
+			if(currentWordLength != 0){
+				// then record the word length
+				wordLength[currentWordLength]++;
+				indexLast = -1;
+			}
+			// set word length to 0 because we are no longer processing a word.
+			currentWordLength = 0;
 			continue;
 		}
 		
 		// record that in the input document, there was a transition from one key to another.
-		keyData[indexLast*KEYPROF_KEYS+indexCurrent]++;
+		// but only record if the last Index was valid.
+		if(indexLast != -1)keyData[indexLast*KEYPROF_KEYS+indexCurrent]++;
+		// increase the word length
+		currentWordLength++;
 		// record the current index as the last.
 		indexLast = indexCurrent;
 	}
@@ -197,6 +226,9 @@ short keyprof_crunch_file(unsigned long long int *keyData, char *filePath, char 
 /// this is the workhorse function. Pass it argc and argv from "int main()" and it will take care of everything.
 // this interpret the command line arguments sent to the program.
 int keyboard_profiler(int argc, char *argv[]){
+	
+	// initialize keyboard profiler stuff
+	keyprof_init();
 	
 	// record what the input arguments were
 	keyprof_log_d("Number of Input Arguments =", argc);
@@ -221,15 +253,28 @@ int keyboard_profiler(int argc, char *argv[]){
 	// keyData[l][l]++;
 	// keyData[l][o]++;
 	unsigned long long int keyData[KEYPROF_KEYS][KEYPROF_KEYS];
-	
+	// this keeps track of how often each key is found.
+	unsigned long long int keyFrequency[KEYPROF_KEYS];
+	// this keeps track of how many times words with certain lengths are found.
+	// index this array with the length of the word you found, and increment whenever you find a word.
+	unsigned long long int wordLength[KEYPROF_WORD_LENGTH_MAX];
 	
 	// set all keyData elements to 0 initially.
+	// set all keyFrequency elements to 0 initially as well
 	int f, s;
 	for(f=0; f<KEYPROF_KEYS; f++){
 		for(s=0; s<KEYPROF_KEYS; s++){
 			keyData[f][s] = 0;
 		}
+		keyFrequency[f] = 0;
 	}
+	
+	// set all wordLength elements to 0 initially
+	int length;
+	for(length=0; length<KEYPROF_WORD_LENGTH_MAX; length++){
+		wordLength[length] = 0;
+	}
+	
 	
 	// this is the default output name
 	char *outputPath = KEYPROF_OUTPUT_NAME_DEFAULT;
@@ -240,6 +285,9 @@ int keyboard_profiler(int argc, char *argv[]){
 	// by default, the program will not include symbols (it will just evaluate alphabetic characters a-z (lowercase and uppercase)).
 	// the option KEYPROF_OPT_INCLUDE_SYMBOLS must be used to activate this.
 	char includeSymbols = 0;
+	// this tells the program to work in keystroke mode if it is 1. 
+	// if it is 0, it works in word mode.
+	char keystrokeMode = 0;
 	
 	//--------------------------------------------
 	// process input arguments
@@ -279,16 +327,22 @@ int keyboard_profiler(int argc, char *argv[]){
 			// continue to the next argument
 			continue;
 		}
+		if(strcmp(argv[arg], KEYPROF_OPT_KEYSTROK_MODE) == 0 || strcmp(argv[arg], KEYPROF_OPT_KEYSTROK_MODE_SHORT) == 0){
+			// record that the user wants to work in keystroke mode instead of word mode
+			keystrokeMode = 1;
+			// continue to the next argument
+			continue;
+		}
 		
 		// if this argument is not an option, then it must be an input file path.
-		keyprof_crunch_file(&keyData[0][0], argv[arg], includeSymbols);
+		keyprof_crunch_file(&keyData[0][0], &keyFrequency[0], &wordLength[0], argv[arg], includeSymbols, keystrokeMode);
 		
 	}
 	
 	// if the we aren't supposed to overwrite the file, we need to read it and record it before we go overwriting it.
 	if(!outputOverwrite) keyprof_load_stats(outputPath, &keyData[0][0]);
 	// save stats to file
-	keyprof_save_stats(&keyData[0][0], outputPath);
+	keyprof_save_stats(&keyData[0][0], &keyFrequency[0], &wordLength[0], outputPath);
 	
 	// successfully computed statistics
 	return 0;
