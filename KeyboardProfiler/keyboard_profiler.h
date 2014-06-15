@@ -8,10 +8,10 @@ int keyboard_profiler(int argc, char *argv[]);
 
 #define KEYPROF_FILE_NOT_FOUND 404
 #define KEYPROF_WORD_LENGTH_MAX 40
-short keyprof_crunch_file(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *wordLength, char *filePath, char includeSymbols, char keystrokeMode);
+short keyprof_crunch_file(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *keyStartingFrequency, unsigned long long int *wordLength, char *filePath, char includeSymbols, char keystrokeMode);
 
 #define KEYPROF_OUTPUT_NAME_DEFAULT "key_statistics.txt"
-short keyprof_save_stats(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *wordLength, char *filePath);
+short keyprof_save_stats(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *keyStartingFrequency, unsigned long long int *wordLength, char *filePath);
 short keyprof_load_stats(char *filePath, unsigned long long int *keyData);
 
 
