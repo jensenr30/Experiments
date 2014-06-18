@@ -108,31 +108,31 @@ uint_fast8_t logic_evaluate_gate(struct logicGate *gate){
 	// calculate the return value from this logic gate
 	switch(gate->op){
 		case lo_OR:
-			return  (x0 | x1);
+			return  (x0 | x1)&0x01;
 			break;
 			
 		case lo_AND:
-			return  (x0 & x1);
+			return  (x0 & x1)&0x01;
 			break;
 			
 		case lo_NOR:
-			return ~(x0 | x1);
+			return (~(x0 | x1))&0x01;
 			break;
 			
 		case lo_NAND:
-			return ~(x0 & x1);
+			return (~(x0 & x1))&0x01;
 			break;
 			
 		case lo_XOR:
-			return  (x0 ^ x1);
+			return  (x0 ^ x1)&0x01;
 			break;
 			
 		case lo_XNOR:
-			return ~(x0 ^ x1);
+			return (~(x0 ^ x1))&0x01;
 			break;
 			
 		case lo_NOT:
-			return ~x0;
+			return (~x0)&0x01;
 			break;
 			
 		// if for some crazy reason, the operation isn't defined as one of the logic functions, then just return 0.
@@ -146,6 +146,31 @@ uint_fast8_t logic_evaluate_gate(struct logicGate *gate){
 }
 
 
-
-
-
+void logic_gate_test(){
+	
+	// declare a logic gate
+	struct logicGate myGate;
+	
+	// set up a test variable
+	uint_fast64_t myVar = 0x00;
+	
+	// set up gate operation
+	myGate.op = lo_XOR;
+	
+	// set up input signal 1 to point to be driven by myVar using bit 0 (xxxxxxxB)
+	myGate.inputSignal[0].gateDriver = NULL;
+	myGate.inputSignal[0].variableDriver = &myVar;
+	myGate.inputSignal[0].bit = 0;
+	
+	// set up input signal 1 to point to be driven by myVar using bit 4 (xxxBxxxx)
+	myGate.inputSignal[1].gateDriver = NULL;
+	myGate.inputSignal[1].variableDriver = &myVar;
+	myGate.inputSignal[1].bit = 1;
+	
+	// test the output of the logic function for some values of myVar
+	for(myVar=0; myVar<32; myVar++){
+		printf("myGate result = %d\n", logic_evaluate_gate(&myGate));
+		if(myVar%4 == 3)printf("\n");
+	}
+	
+}

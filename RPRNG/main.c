@@ -13,12 +13,14 @@ This will be achieved through a genetic algorithm that optimizes for:
 - a long repeat cycle
 
 */
+
 #include <stdio.h>
 #include "logic_function.h"
 #include "RPRNG.h"
 
-
 int main( int argc, char *argv[] ){
+	
+	logic_gate_test();
 	
 	
 	

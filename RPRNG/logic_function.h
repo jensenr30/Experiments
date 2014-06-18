@@ -64,13 +64,26 @@ struct logicSignal {
 /// lo stands for "logic operation"
 // these are used in logic gate specification.
 // Based on what number if stored in the op variable, a different operation will be performed on its signals.
-#define lo_OR		0
-#define lo_AND		1
-#define lo_NOR		2
-#define lo_NAND		3
-#define lo_XOR		4
-#define lo_XNOR		5
-#define lo_NOT		6	// NOT works on ONLY inputSignal[0]. inputSignal[1] is essentially ignored for this gate
+// these numbers are derived from the truth tables of each logic function.
+// for example,
+	// NAND TRUTH TABLE
+	// x0 x1 | y
+	// ------|---
+	//  0  0 | 1
+	//  0  1 | 1
+	//  1  0 | 1
+	//  1  1 | 0
+	// the number that is assigned the lo_NAND definition is 7 because 1*1 + 1*2 + 1*4 + 0*8 = 7 (derived from the right hand side of the truth table. the highest bit is the least significant.
+	// logic_OR   is 0111 in binary (14 in decimal) (0x0e in hexadecimal)
+	// logic_NOT  is 0101 in binary (5 in decimal) (0x05 in hexadecimal)
+	// etc...				// MSB->LSB
+#define lo_OR		0x0e	// 1110 (bin)
+#define lo_AND		0x08	// 1000 (bin)
+#define lo_NOR		0x01	// 0001 (bin)
+#define lo_NAND		0x07	// 0111 (bin)
+#define lo_XOR		0x06	// 0110 (bin)
+#define lo_XNOR		0x09	// 1001 (bin)
+#define lo_NOT		0x05	// 0101 (bin) NOT works on ONLY inputSignal[0]. inputSignal[1] is essentially ignored for this gate
 
 // there are two input signals to any gate
 #define LOGIC_GATE_INPUT_SIGNALS 2
@@ -95,5 +108,6 @@ short logic_signal_point_at_gate(struct logicSignal *signal, struct logicGate *g
 
 uint_fast8_t logic_evaluate_signal(struct logicSignal *signal);
 uint_fast8_t logic_evaluate_gate(struct logicGate *gate);
+void logic_gate_test();
 
 
