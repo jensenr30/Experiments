@@ -62,15 +62,18 @@ struct logicSignal {
 
 
 /// lo stands for "logic operation"
+// these are used in logic gate specification.
+// Based on what number if stored in the op variable, a different operation will be performed on its signals.
 #define lo_OR		0
 #define lo_AND		1
 #define lo_NOR		2
 #define lo_NAND		3
-#define lo_NOT		4
-#define lo_XOR		5
-#define lo_XNOR		6
+#define lo_XOR		4
+#define lo_XNOR		5
+#define lo_NOT		6	// NOT works on ONLY inputSignal[0]. inputSignal[1] is essentially ignored for this gate
 
-#define LOGIC_GATE_OPERANDS 2
+// there are two input signals to any gate
+#define LOGIC_GATE_INPUT_SIGNALS 2
 /// this is a logic gate. 
 struct logicGate {
 
@@ -79,7 +82,7 @@ struct logicGate {
 	
 	// this is a pointer to a logicSignal.
 	// A logic Signal can either be the output of another logicGate or a bit from a variable
-	struct logicSignal inputSignal[LOGIC_GATE_OPERANDS];
+	struct logicSignal inputSignal[LOGIC_GATE_INPUT_SIGNALS];
 	
 };
 
@@ -88,3 +91,9 @@ struct logicGate {
 
 short logic_signal_point_at_variable(struct logicSignal *signal, uint_fast64_t *vDriver, uint_fast8_t bit);
 short logic_signal_point_at_gate(struct logicSignal *signal, struct logicGate *gDriver);
+
+
+uint_fast8_t logic_evaluate_signal(struct logicSignal *signal);
+uint_fast8_t logic_evaluate_gate(struct logicGate *gate);
+
+
