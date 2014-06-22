@@ -19,18 +19,32 @@ short keyprof_load_stats(char *filePath, unsigned long long int *keyData);
 // if this option is seen, the next argument will be taken as the output path to shove the data into.
 #define KEYPROF_OPT_OUTPUT_PATH				"--output-file"
 #define KEYPROF_OPT_OUTPUT_PATH_SHORT		"-f"
+
 // this option will make the program erase the output file if it has any data already in it.
 // the default action is to add the data to it each time.
 #define KEYPROF_OPT_OVERWRITE				"--overwrite"
 #define KEYPROF_OPT_OVERWRITE_SHORT			"-o"
-// 
+
+// this option is useful when you are including symbols in your computation.
+// adding this is useful and when you want to gather data that reflects KEYSTROKE characteristics rather than data that reflects characteristics of the language itself.
+// this is nice when trying to figure out how the user would need to use the keyboard to write the sampled text.
 #define KEYPROF_OPT_INCLUDE_SYMBOLS			"--include-symbols"
 #define KEYPROF_OPT_INCLUDE_SYMBOLS_SHORT	"-s"
 
+// adding this option will allow you to see what characters come after which.
+// this will ignore word boundaries.
+// for example, the phrase "hi bro" would have no data for the 'i' character under normal operation.
+// however, that same phrase WOULD have data for the 'i' character under keystroke mode. keystroke mode would record that 'i' goes to 'b'.
+// This is the because keystroke mode ignores word boundaries.
 #define KEYPROF_OPT_KEYSTROK_MODE			"--keystroke-mode"
 #define KEYPROF_OPT_KEYSTROK_MODE_SHORT		"-k"
 
-// this is a string of the valid character.
+// the argument immediately following this flag will be interpreted as the blacklist document.
+// every word found the blacklist will be rejected when computing the statistics of the sample text documents.
+#define KEYPROF_OPT_WORD_BLACKLIST			"--blacklist"
+#define KEYPROF_OPT_BLACKLIST_SHORT			"-b"
+
+// this is a string of the valid characters.
 // it is set up so that the first half is the lowercase values of each key and the second half is the uppercase values of each key.
 char *keyDataString;
 

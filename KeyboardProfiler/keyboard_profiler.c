@@ -137,9 +137,9 @@ short keyprof_load_stats(char *filePath, unsigned long long int *keyData){
 	
 	
 	// these are used to process the data from the loadFile
-	char charCurrent;
-	char charLast;
-	char charInput;
+	unsigned char charCurrent;
+	unsigned char charLast;
+	unsigned char charInput;
 	
 	
 	while(1){
@@ -182,9 +182,9 @@ short keyprof_crunch_file(unsigned long long int *keyData, unsigned long long in
 	// otherwise, the file should be open and ready for business.
 	
 	// these are used to process the data from the loadFile
-	char indexCurrent;
-	char indexLast = -1; // this is initialized to -1 because there is no lastIndex when you start up the program.
-	char charInput;
+	unsigned char indexCurrent;
+	unsigned char indexLast = -1; // this is initialized to -1 because there is no lastIndex when you start up the program.
+	unsigned char charInput;
 	int currentWordLength=0;
 	
 	
@@ -318,7 +318,9 @@ int keyboard_profiler(int argc, char *argv[]){
 		wordLength[length] = 0;
 	}
 	
-	
+	//--------------------------------------------
+	// process input arguments
+	//--------------------------------------------
 	// this is the default output name
 	char *outputPath = KEYPROF_OUTPUT_NAME_DEFAULT;
 	// normally, the output of this program is added to the output of any previous executions of this program.
@@ -331,6 +333,7 @@ int keyboard_profiler(int argc, char *argv[]){
 	// this tells the program to work in keystroke mode if it is 1. 
 	// if it is 0, it works in word mode.
 	char keystrokeMode = 0;
+	
 	
 	//--------------------------------------------
 	// process input arguments
