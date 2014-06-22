@@ -38,7 +38,8 @@ This program can be used via command line using the following formats:
 
 
 
-
+#include <inttypes.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "keyboard_profiler.h"
@@ -137,13 +138,13 @@ short keyprof_load_stats(char *filePath, unsigned long long int *keyData){
 	
 	
 	// these are used to process the data from the loadFile
-	unsigned char charCurrent;
-	unsigned char charLast;
-	unsigned char charInput;
+	//unsigned char charCurrent;
+	//unsigned char charLast;
+	//unsigned char charInput;
 	
 	
 	while(1){
-		charInput = fgetc(loadFile);
+		//charInput = fgetc(loadFile);
 		
 		/// TODO: PROCESS INPUT DATA
 		
@@ -155,6 +156,174 @@ short keyprof_load_stats(char *filePath, unsigned long long int *keyData){
 	fclose(loadFile);
 	// success
 	return 0;
+}
+
+/// this file will search an input file and determine if the text contains a certain word.
+// returns 0 if the targetWord WASN'T found in the blackListFile.
+// returns 1 if the targetWord WAS    found in the blackListFile.
+// returns -1 if the blackListPath is NULL.
+// returns -2 if the targetWord is NULL.
+// return -3 if the function cannot open the blackListFile file.
+short keyprof_find_string_in_blacklist(char *blackListPath, char *targetWord){
+	
+	if(blackListPath == NULL){
+		keyprof_log("keyprof_find_string_in_file() was sent NULL blackListFile path string");
+		return -1;
+	}
+	if(targetWord == NULL){
+		keyprof_log("keyprof_find_string_in_file() was sent NULL targetWord.");
+		return -2;
+	}
+	
+	//attempt to open the blacklist file
+	FILE *blackListFile = fopen(blackListPath, "r");
+	if(blackListFile == NULL){
+		keyprof_log("keyprof_find_string_in_file() could not open the blackListFile."); 
+		return -3;
+	}
+	
+	// calculate the length of targetWord.
+	int targetWordLength = strlen(targetWord);
+	
+	// create a string that has the right length to be checked against the targetWord.
+	char *inputWord = malloc(targetWordLength+1+2);
+	
+	
+	// fill up the string initially with the first <targetWordLength> characters from the blacklist into the inputWord to prepare the data for the main while(1) loop.
+	int i;
+	// set the first character to a space
+	inputWord[0] = ' ';
+	// set the middle characters to the first <targetWordLength> characters from the blacklist file.
+	for(i=1; i<targetWordLength+1; i++){
+		//
+		inputWord[i] = fgetc(blackListFile);
+		// if you encounter to end of the file before you finishing inputting the first <targetWordLength> characters,
+		if(inputWord[i] == EOF){
+			// close the file
+			fclose(blackListFile);
+			// and report that it no match was found.
+			return 0;
+		}
+	}
+	// set the last  character to a space
+	inputWord[targetWordLength+1] = ' ';
+	// terminate the inputWord string will a null character.
+	inputWord[targetWordLength+2] = '\0';
+	
+	
+	// this variable will be used to tell if the inputWord matches the targetWord.
+	uint_fast8_t match;
+	while(1){
+		
+		// set the "match" variable to 1.
+		//if the following code finds a discrepancy between the targetWord and the inputWord, it will set it to 0.
+		match = 1;
+		
+		
+		// if the letters on either side are alphabetic,
+		if((inputWord[0] >= 'a' && inputWord[0] <= 'z') || (inputWord[0] >= 'A' && inputWord[0] <= 'Z')){
+			// there is no match
+			match = 0;
+		}
+		
+		// only continue checking the inputWord against the targetWord if a discrepancy hasn't already been found
+		if(match == 1){
+			// check to see any of the word characters are different between the targetWord and the inputWord
+			for(i=0; i<targetWordLength; i++){
+				// if there is any discrepancy between the characters,
+				if(inputWord[i+1] != targetWord[i]){
+					// then the words don't match.
+					match = 0;
+					// stop checking this point in the blacklist file
+					break;
+				}
+			}
+		}
+		
+		// if you have found a match, 
+		if(match == 1){
+			// close the file
+			fclose(blackListFile);
+			// and report the match
+			return 1;
+		}
+		
+		// otherwise, shift the entire input word over
+		for(i=0; i<targetWordLength+2-1; i++){
+			inputWord[i+1] = inputWord[i];
+		}
+		// input a new character at the beginning of targetWordLength
+		inputWord[0] = fgetc(blackListFile);
+		
+		if(inputWord[0] == EOF){
+			// if you have reached the end of the file, break.
+			//the code after this while(1) loop will close the blacklist file and return 0 because a match has not been found yet if the loop is still running
+			// (when a match is found, the loop will exit, closing the file, and returning 1).
+			break;
+		}
+		
+		//otherwise, just start the loop over again and try to find a match on the next position of the blacklist
+	}
+	
+	
+	// close the blackListFile.
+	fclose(blackListFile); 
+	// successfully searched and DID NOT FIND the targetWord in the blacklist
+	return 0;
+}
+
+/// this function will create a filtered version of a text file. whatever words appear in the blacklist file will be omitted from the return file.
+// this function will create a new file based on the input file that lacks the words on the black list.
+// this function returns...
+	// 0 on success
+	// 1 on null filePathInput
+	// 2 on null filePathBlackList
+	// 3 on null filePathReturn
+	// 4 when the program cannot open filePathInput
+	// 5 when the program cannot open filePathBlackList
+	// 6 when the program cannot open fileReturn
+short keyprof_create_filtered_file(char *filePathInput, char *filePathBlackList, char  *filePathReturn){
+	
+	//--------------------------------------------
+	// make sure all pointers are functioning.
+	//--------------------------------------------
+	
+	// check to make sure that the filePathInput pointer is valid.
+	if(filePathInput == NULL){
+		keyprof_log("keyprof_create_filtered_file() received null input variable. filePathInput = NULL");
+		return 1;
+	}
+	// check to make sure that the filePathBlackList pointer is valid.
+	if(filePathBlackList == NULL){
+		keyprof_log("keyprof_create_filtered_file() received null input variable. filePathBlackList = NULL");
+		return 2;
+	}
+	// check to make sure that the fileReturnPath pointer is valid.
+	if(filePathReturn == NULL){
+		keyprof_log("keyprof_create_filtered_file() received null input variable. filePathReturn = NULL");
+		return 3;
+	}
+	
+	// attempt to open the input file
+	FILE *fileInput = fopen(filePathInput, "r");
+	if(fileInput == NULL){
+		keyprof_log("keyprof_create_filtered_file() could not open the fileInput");
+		return 4;
+	}
+	//attempt to open the return file
+	FILE *fileReturn = fopen(filePathReturn, "r");
+	if(fileReturn == NULL){
+		keyprof_log("keyprof_create_filtered_file() could not open the fileReturn."); 
+		return 6;
+	}
+	
+	
+	/// TODO: write function that filters the input text document.
+	/// somehow you will need to use the keyprof_find_string_in_blacklist() function.
+	
+	
+	
+	return 0; // successfully applied a black list to the file.
 }
 
 

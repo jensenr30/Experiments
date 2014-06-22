@@ -14,6 +14,8 @@ short keyprof_crunch_file(unsigned long long int *keyData, unsigned long long in
 short keyprof_save_stats(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *keyStartingFrequency, unsigned long long int *wordLength, char *filePath);
 short keyprof_load_stats(char *filePath, unsigned long long int *keyData);
 
+short keyprof_create_filtered_file(char *filePathInput, char *fileBlackListInput, char  *filePathReturn);
+
 
 /// these are all of the command line options that are available
 // if this option is seen, the next argument will be taken as the output path to shove the data into.
