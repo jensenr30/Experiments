@@ -1,0 +1,82 @@
+use options in the command line while running 
+
+=================================================================================================================================================================================
+option name		|	alias	|	
+=================================================================================================================================================================================
+
+--blacklist			-b
+	This option will allow you to use a blacklist.
+	When computing the statistics on the input text documents, the program will ignore any words that are in the blacklist.
+	For example, if you happened to include the following words in your blacklist:
+		the a an
+	Then the words "the" "a" and "an" would be rejected completely and ignored when computing the statistics on the input text documents.
+	
+	When using the blacklist, the argument IMMEDIATELY following the "--blacklist" or "-b" option will be interpreted as the file path for the blacklist text document.
+	
+	PROTIP:
+	The program will check the blacklist from its beginning to its end IN THAT ORDER.
+	Consequently, the program takes less time to find blacklist words at the beginning of the blacklist document.
+	So, if you want to make the program run faster, put more common words that you want rejected at the beginning of the blacklist.
+	This should speed things up considerably.
+
+
+
+--keystroke-mode	-k
+	This option is used when you are more interested in how the writer must have typed the text document on a keyboard (which keys were stroked and in what order).
+	In normal "word-mode", the program cares only about what letters come after which INSIDE WORDS.
+	So for the phrase, "Yo, Dim!",
+	The default "word-mode" would record that...
+		oO comes after yY
+		iI comes after dD
+		mM comes after iI
+	and that is all.
+	However, using keystroke mode, the phrase "Yo, Dim!" would be interpreted in the following manner:
+		o comes after y
+		,< comes after oO
+		dD comes after ,<
+		iI comes after dD
+		mM comes after iI
+	and that is all (note that keystroke mode doesn't record the number keys or the symbols on them)
+	
+	In summary, keystroke mode is useful to someone who is more interested in seeing how the writer must have stroked the keyboard when writing the text document.
+	Otherwise, if you are more interested in the statistics of the words and the language itself, skip this option. It probably isn't what you are looking for.
+
+	
+	
+--output-file		-f
+	This specifies a file that the results will be stored in.
+	The argument immediately following this one will be interpreted as the output file path.
+	Example:
+		keyprof.exe aBook.txt -output-file aBook_keyprofStatistics.txt
+	This will crunch the numbers on "aBook.txt" and output all of the collected data into "aBook_keyprofStatistics.txt"
+	
+	
+
+--overwrite			-o
+	This will overwrite the output file if it already exists.
+	By default, if the output file alaready exists, the program will attempt to open it, add its existing data to the data it will crunch, and then overwrite it.
+	
+	If you want the output file to accumulate data from all of the text documents you jam into the program, DON'T BOTHER WITH THIS ARGUMENT.
+	However, if you want the program to start with a clean slate every time, it is suggested that you use this argument to ensure that happens.
+
+
+
+--include-symbols	-s
+	This will include symbols in the definition of a "word"
+	The valid symbols are
+		`~
+		-_
+		=+
+		[{
+		]}
+		;:
+		'"
+		,<
+		.>
+		/?
+	Notice that these symbols are the symbols on the qwerty keyboard that can be shuffled around (excluding the number and F1, F2, F3, etc...  keys) because they are all the same size.
+	This means that this program has the ability to analyze how text documents must have been written.
+	This is useful for someone who might be trying to create an optimized keyboard layout.
+	
+	
+

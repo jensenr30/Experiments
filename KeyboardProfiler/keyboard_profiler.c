@@ -182,36 +182,52 @@ short keyprof_find_string_in_blacklist(char *blackListPath, char *targetWord){
 		return -3;
 	}
 	
+	//------------------------------------------------------
+	// initializing variables for blacklist evaluation
+	//------------------------------------------------------
+	
 	// calculate the length of targetWord.
 	int targetWordLength = strlen(targetWord);
 	
 	// create a string that has the right length to be checked against the targetWord.
 	char *inputWord = malloc(targetWordLength+1+2);
 	
+	// this keeps track of when we need to quit should we encounter the end of the file without finding an occurrence of the targetWord.
+	// this is set to 1 when the program finds the end of a file (EOF)
+	char *testOnceMoreThenQuit = 0;
 	
 	// fill up the string initially with the first <targetWordLength> characters from the blacklist into the inputWord to prepare the data for the main while(1) loop.
 	int i;
 	// set the first character to a space
 	inputWord[0] = ' ';
 	// set the middle characters to the first <targetWordLength> characters from the blacklist file.
-	for(i=1; i<targetWordLength+1; i++){
+	for(i=1; i<targetWordLength+2; i++){
 		//
 		inputWord[i] = fgetc(blackListFile);
 		// if you encounter to end of the file before you finishing inputting the first <targetWordLength> characters,
 		if(inputWord[i] == EOF){
-			// close the file
-			fclose(blackListFile);
-			// and report that it no match was found.
-			return 0;
+			// if you have not yet input enough characters to encounter the full word,
+			if( i < targetWordLength ){
+				// close the blacklist file.
+				fclose(blackListFile);
+				// because the blacklist was too short, report that you did not find the target word in the blacklist.
+				return 0;
+			}
+			// otherwise, if the null was just after the end of the  targetWordLength, there is still a chance that the targetWord exists in the blacklist.
+			else{
+				break;
+			}
+			
 		}
 	}
-	// set the last  character to a space
-	inputWord[targetWordLength+1] = ' ';
+	
 	// terminate the inputWord string will a null character.
 	inputWord[targetWordLength+2] = '\0';
 	
-	
-	// this variable will be used to tell if the inputWord matches the targetWord.
+	//------------------------------------------------------
+	// main evaluation loop
+	//------------------------------------------------------
+	// this variable will be used to tell if the targetWord occurs anywhere in the blacklist text file
 	uint_fast8_t match;
 	while(1){
 		
@@ -221,7 +237,7 @@ short keyprof_find_string_in_blacklist(char *blackListPath, char *targetWord){
 		
 		
 		// if the letters on either side are alphabetic,
-		if((inputWord[0] >= 'a' && inputWord[0] <= 'z') || (inputWord[0] >= 'A' && inputWord[0] <= 'Z')){
+		if((inputWord[0] >= 'a' && inputWord[0] <= 'z') || (inputWord[0] >= 'A' && inputWord[0] <= 'Z') || (inputWord[targetWordLength+2-1] >= 'a' && inputWord[targetWordLength+2-1] <= 'z') || (inputWord[targetWordLength+2-1] >= 'A' && inputWord[targetWordLength+2-1] <= 'Z') ){
 			// there is no match
 			match = 0;
 		}
@@ -248,18 +264,21 @@ short keyprof_find_string_in_blacklist(char *blackListPath, char *targetWord){
 			return 1;
 		}
 		
+		// if you tested once more and still did not find the target word, then return 0 (indicating that you did not find the target word in the blacklist.
+		if(testOnceMoreThenQuit){
+			return 0;
+		}
+		
 		// otherwise, shift the entire input word over
 		for(i=0; i<targetWordLength+2-1; i++){
-			inputWord[i+1] = inputWord[i];
+			inputWord[i] = inputWord[i+1];
 		}
 		// input a new character at the beginning of targetWordLength
-		inputWord[0] = fgetc(blackListFile);
+		inputWord[targetWordLength+1] = fgetc(blackListFile);
 		
-		if(inputWord[0] == EOF){
-			// if you have reached the end of the file, break.
-			//the code after this while(1) loop will close the blacklist file and return 0 because a match has not been found yet if the loop is still running
-			// (when a match is found, the loop will exit, closing the file, and returning 1).
-			break;
+		if(inputWord[targetWordLength+1] == EOF){
+			// if you have found the end of the file, test one more word, then quit.
+			testOnceMoreThenQuit = 1;
 		}
 		
 		//otherwise, just start the loop over again and try to find a match on the next position of the blacklist
@@ -284,9 +303,9 @@ short keyprof_find_string_in_blacklist(char *blackListPath, char *targetWord){
 	// 6 when the program cannot open fileReturn
 short keyprof_create_filtered_file(char *filePathInput, char *filePathBlackList, char  *filePathReturn){
 	
-	//--------------------------------------------
+	//------------------------------------------------------
 	// make sure all pointers are functioning.
-	//--------------------------------------------
+	//------------------------------------------------------
 	
 	// check to make sure that the filePathInput pointer is valid.
 	if(filePathInput == NULL){
@@ -449,9 +468,9 @@ int keyboard_profiler(int argc, char *argv[]){
 	// if the number of arguments was 1 or less, that means that there couldn't possibly have been an input document
 	if(argc <= 1) return KEYPROF_NO_INPUT_FILES_PASSED;
 	
-	//--------------------------------------------
+	//------------------------------------------------------
 	// set up input data
-	//--------------------------------------------
+	//------------------------------------------------------
 	
 	// this is the array that will hold all of the key data
 	// the first index, keydata[FirstIndex][] is an index into what the previous key was
@@ -487,9 +506,9 @@ int keyboard_profiler(int argc, char *argv[]){
 		wordLength[length] = 0;
 	}
 	
-	//--------------------------------------------
+	//------------------------------------------------------
 	// process input arguments
-	//--------------------------------------------
+	//------------------------------------------------------
 	// this is the default output name
 	char *outputPath = KEYPROF_OUTPUT_NAME_DEFAULT;
 	// normally, the output of this program is added to the output of any previous executions of this program.
@@ -504,9 +523,9 @@ int keyboard_profiler(int argc, char *argv[]){
 	char keystrokeMode = 0;
 	
 	
-	//--------------------------------------------
+	//------------------------------------------------------
 	// process input arguments
-	//--------------------------------------------
+	//------------------------------------------------------
 	// arg starts at 1 because the first argument is the file path of keyprof.exe and we don't really care about that here.
 	for(arg=1; arg<argc; arg++){
 		
