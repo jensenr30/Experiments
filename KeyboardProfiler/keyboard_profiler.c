@@ -69,6 +69,59 @@ void keyprof_log_s(char *string, char *data){
 void keyprof_init(){
 	// initialize that keyDataString
 	keyDataString = "abcdefghijklmnopqrstuvwxyz`-=[];',./ABCDEFGHIJKLMNOPQRSTUVWXYZ~_+{}:\"<>?";
+	// set default logPath
+	logPath = KEYPROF_LOG_NAME_DEFAULT;
+}
+
+/// this function will open a text file and print a "*\n" in the text file "folderName\word.txt"
+// this function is useful for making a subfolder filled with all words found in text files, AND how many times the word was found.
+// returns 0 on success
+// returns 1 on NULL folderName
+// returns 2 on NULL word
+short keyprof_log_word(char *folderName, char *word){
+	
+	if(folderName == NULL){
+		keyprof_log("keyprof_log_words() received NULL folderName");
+		return 1;
+	}
+	
+	if(word == NULL){
+		keyprof_log("keyprof_log_words() received NULL word");
+		return 2;
+	}
+	
+	//calculate the path length (enough space to store the folder, and forward slash, the word, the extension, and a null character).
+	int pathLength = strlen(folderName)+strlen("/")+strlen(word)+strlen(".txt");
+	// allocate enough space to store the path of the text document PLUS the terminating null character
+	char *filePath = malloc(pathLength+1);
+	
+	// folderName
+	strcpy(filePath, folderName);
+	// folderName/
+	strcat(filePath, "/");
+	// folderName/word
+	strcat(filePath, word);
+	// folderName/word.txt
+	strcat(filePath, ".txt");
+	filePath[pathLength] = '\0';
+	
+	// attempt to open the word file
+	FILE *wordFile = fopen(filePath, "a");
+	
+	// if you run into a problem, report it.
+	if(wordFile == NULL){
+		keyprof_log_s("keyprof_log_words() couldn't open wordFile with path=", filePath);
+		return 3;
+	}
+	
+	// otherwise, the file was opened correctly.
+	// record an occurrence
+	fprintf(wordFile, "*\n");
+	// close up shop on your way out
+	fclose(wordFile);
+	
+	// successfully recorded that some word occurred.
+	return 0;
 }
 
 /// this will save keyData to file
@@ -123,6 +176,8 @@ short keyprof_save_stats(unsigned long long int *keyData, unsigned long long int
 	// success
 	return 0;
 }
+
+
 
 
 
@@ -350,17 +405,17 @@ short keyprof_create_filtered_file(char *filePathInput, char *filePathBlackList,
 
 */
 
-/* OLD keyprof_crunch_file() function
-/// this will perform the statistical number crunching on the input files.
+/* OLD keyprof_parse_file() function
+/// this will perform the statistical number parseing on the input files.
 // this will take a text file and reduce it to numbers in an array that describe how it works.
 // keyData is a pointer to an array of ULL integers that is KEYPROF_KEYS x KEYPROF_KEYS in size. this records what keys will lead to what keys.
 // keyFrequency is a pointer to an array of size KEYPROF_KEYS that record the frequency of each key.
 // wordLength is a pointer to an array of length KEYPROF_WORD_LENGTH_MAX that records how many times a word has beeen found that has x number of characters in it (where x is used to index into the array)
 // keyData, keyFrequency, and wordLength all must be valid for the function to work. If any are NULL, the program will return 1.
-// filePath is the path of the file that will be loaded and crunched (for example: "C:\Users\MyUserName\Documents\MyDoc.txt")
+// filePath is the path of the file that will be loaded and parseed (for example: "C:\Users\MyUserName\Documents\MyDoc.txt")
 // include symbols will dictate whether or not we use symbols `~-_=+[{]};:'",<.>/?
 // keystrokeMode will count the end of words and the beginning of the next word as being related. word mode will restrict letter associations to the words they are found in.
-short keyprof_crunch_file(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *keyStartingFrequency, unsigned long long int *wordLength, char *filePath, char includeSymbols, char keystrokeMode, char *blackListPath){
+short keyprof_parse_file(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *keyStartingFrequency, unsigned long long int *wordLength, char *filePath, char includeSymbols, char keystrokeMode, char *blackListPath){
 	
 	// make sure the pointers are all valid.
 	if(keyData == NULL || keyFrequency == NULL || wordLength == NULL) return 1;
@@ -455,17 +510,17 @@ short keyprof_crunch_file(unsigned long long int *keyData, unsigned long long in
 
 
 
-/// this will perform the same statistical number crunching on an input file that keyprof_crunch_file() will, but it is designed to input file data in full words.
+/// this will perform the same statistical number parseing on an input file that keyprof_parse_file() will, but it is designed to input file data in full words.
 // this will take a text file and reduce it to numbers in an array that describe how it works.
 // keyData is a pointer to an array of ULL integers that is KEYPROF_KEYS x KEYPROF_KEYS in size. this records what keys will lead to what keys.
 // keyFrequency is a pointer to an array of size KEYPROF_KEYS that record the frequency of each key.
 // wordLength is a pointer to an array of length KEYPROF_WORD_LENGTH_MAX that records how many times a word has beeen found that has x number of characters in it (where x is used to index into the array)
 // keyData, keyFrequency, and wordLength all must be valid for the function to work. If any are NULL, the program will return 1.
-// filePath is the path of the file that will be loaded and crunched (for example: "C:\Users\MyUserName\Documents\MyDoc.txt")
+// filePath is the path of the file that will be loaded and parseed (for example: "C:\Users\MyUserName\Documents\MyDoc.txt")
 // include symbols will dictate whether or not we use symbols `~-_=+[{]};:'",<.>/?
 // keystrokeMode will count the end of words and the beginning of the next word as being related. word mode will restrict letter associations to the words they are found in.
 // blackListPath is a path to the file that contains blacklisted words. any words in the blacklist will not be used when computing statistics on the input file, "filePath"
-short keyprof_crunch_file_word(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *keyStartingFrequency, unsigned long long int *wordLength, char *filePath, char includeSymbols, char keystrokeMode, char *blackListPath){
+short keyprof_parse_file_word(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *keyStartingFrequency, unsigned long long int *wordLength, char *filePath, char includeSymbols, char keystrokeMode, char *blackListPath, char *wordPath){
 	
 	// make sure the pointers are all valid.
 	if(keyData == NULL || keyFrequency == NULL || wordLength == NULL) return 1;
@@ -475,6 +530,8 @@ short keyprof_crunch_file_word(unsigned long long int *keyData, unsigned long lo
 	// if the file cannot be opened, then report a FILE_NOT_FOUND error.
 	if(inputFile == NULL) return KEYPROF_FILE_NOT_FOUND;
 	
+	// print information to command line
+	printf("beginning parsing of file \"%s\"...\n", filePath);
 	
 	
 	// otherwise, the file should be open and ready for business.
@@ -482,49 +539,58 @@ short keyprof_crunch_file_word(unsigned long long int *keyData, unsigned long lo
 	// these are used to process the data from the loadFile
 	int indexCurrent;
 	int indexLast = -1; // this is initialized to -1 because there is no lastIndex when you start up the program.
-	char charInput;
+	int charInput;
 	char currentWord[KEYPROF_WORD_LENGTH_MAX] = "\0";
 	int currentWordLength=0;
 	char currentWordComplete = 0;
 	int c;
-	
+	// this is how many times the while loop has been iterated through.
+	// This starts at -1 so that the loop starts at 0
+	int_fast64_t iterations = -1;
+	// when this is set to 0, the while() loop will exit
+	int_fast8_t stillCrunching = 1;
 	
 	// input all characters
-	while(1){
+	while(stillCrunching){
+		
+		if(iterations%20000==0){
+			// print information to command line
+			printf("characters found = %lu\n", iterations);
+		}
+		
+		// increment the iterations.
+		iterations++;
 		
 		// input a character
 		charInput = fgetc(inputFile);
 		
+		
 		// if the character input is an uppercase letter,
 		if(charInput >= 'A' && charInput <= 'Z'){
-			// record it on a scale of 0 to 25 (a through z)
-			indexCurrent = charInput-'A';
 			// add the input character to the word
 			currentWord[currentWordLength] = charInput+32; // add an offset of 32 to make all characters lowercase
 			// increase the currentWordLength
 			currentWordLength++;
-			
 		}
+		
 		// if the character is a lowercase letter,
 		else if(charInput >= 'a' && charInput <= 'z'){
-			// record it on a scale of 0 to 25 (a through z)
-			indexCurrent = charInput-'a';
 			// add the input character to the word
 			currentWord[currentWordLength] = charInput;
 			// increase the currentWordLength
 			currentWordLength++;
 		}
 		// check for symbols
-		else if( includeSymbols && (charInput == '`' || charInput == '~') ) { indexCurrent = 26; currentWord[currentWordLength] = '`'; }
-		else if( includeSymbols && (charInput == '-' || charInput == '_') ) { indexCurrent = 27; currentWord[currentWordLength] = '-'; }
-		else if( includeSymbols && (charInput == '=' || charInput == '+') ) { indexCurrent = 28; currentWord[currentWordLength] = '='; }
-		else if( includeSymbols && (charInput == '[' || charInput == '{') ) { indexCurrent = 29; currentWord[currentWordLength] = '['; }
-		else if( includeSymbols && (charInput == ']' || charInput == '}') ) { indexCurrent = 30; currentWord[currentWordLength] = ']'; }
-		else if( includeSymbols && (charInput == ';' || charInput == ':') ) { indexCurrent = 31; currentWord[currentWordLength] = ';'; }
-		else if( includeSymbols && (charInput == '\''|| charInput == '"') ) { indexCurrent = 32; currentWord[currentWordLength] = '\'';}
-		else if( includeSymbols && (charInput == ',' || charInput == '<') ) { indexCurrent = 33; currentWord[currentWordLength] = ','; }
-		else if( includeSymbols && (charInput == '.' || charInput == '>') ) { indexCurrent = 34; currentWord[currentWordLength] = '.'; }
-		else if( includeSymbols && (charInput == '/' || charInput == '?') ) { indexCurrent = 35; currentWord[currentWordLength] = '/'; }
+		else if( includeSymbols && (charInput == '`' || charInput == '~') ) { currentWord[currentWordLength] = '`'; }
+		else if( includeSymbols && (charInput == '-' || charInput == '_') ) { currentWord[currentWordLength] = '-'; }
+		else if( includeSymbols && (charInput == '=' || charInput == '+') ) { currentWord[currentWordLength] = '='; }
+		else if( includeSymbols && (charInput == '[' || charInput == '{') ) { currentWord[currentWordLength] = '['; }
+		else if( includeSymbols && (charInput == ']' || charInput == '}') ) { currentWord[currentWordLength] = ']'; }
+		else if( includeSymbols && (charInput == ';' || charInput == ':') ) { currentWord[currentWordLength] = ';'; }
+		else if( includeSymbols && (charInput == '\''|| charInput == '"') ) { currentWord[currentWordLength] = '\'';}
+		else if( includeSymbols && (charInput == ',' || charInput == '<') ) { currentWord[currentWordLength] = ','; }
+		else if( includeSymbols && (charInput == '.' || charInput == '>') ) { currentWord[currentWordLength] = '.'; }
+		else if( includeSymbols && (charInput == '/' || charInput == '?') ) { currentWord[currentWordLength] = '/'; }
 		else {
 			// if the word that was just input had a length greater than 0, then we have found a word. calculate statistics on it.
 			if(currentWordLength > 0) currentWordComplete = 1;
@@ -542,6 +608,7 @@ short keyprof_crunch_file_word(unsigned long long int *keyData, unsigned long lo
 				
 				// record that a word with currentWordLength was found.
 				wordLength[currentWordLength]++;
+				if(wordPath != NULL) keyprof_log_word(wordPath, currentWord);
 				
 				for(c=0; c<currentWordLength; c++){
 					// input a character
@@ -590,10 +657,16 @@ short keyprof_crunch_file_word(unsigned long long int *keyData, unsigned long lo
 			currentWordComplete = 0;
 			currentWordLength = 0;
 		}
-		if(charInput == EOF){
-			break;
+		
+		if(feof(inputFile)){
+			stillCrunching = 0;
 		}
 	}
+	
+	// print information to command line
+	printf("characters found = %lu\n", iterations);
+	// print information to command line
+	printf("finished parsing file. closing file.\n\n");
 	
 	// close up the place on your way out.
 	fclose(inputFile);
@@ -676,9 +749,10 @@ int keyboard_profiler(int argc, char *argv[]){
 	// this tells the program to work in keystroke mode if it is 1. 
 	// if it is 0, it works in word mode.
 	char keystrokeMode = 0;
-	// this keeps track of the file path of the blacklist.
+	// this keeps track of the file path of the blacklist. NULL by default
 	char *blackListPath = NULL;
-	
+	// this keeps track of the name of the folder that the word data will be stored in. NULL by default
+	char *logWordsPath = NULL;
 	
 	//------------------------------------------------------
 	// process input arguments
@@ -729,6 +803,19 @@ int keyboard_profiler(int argc, char *argv[]){
 			// continue to the next argument
 			continue;
 		}
+		// check to see if the user wants to log words and where the user wants to log words to
+		if(strcmp(argv[arg], KEYPROF_OPT_LOG_WORDS) == 0 || strcmp(argv[arg], KEYPROF_OPT_LOG_WORDS_SHORT) == 0){
+			// move to the next argument
+			arg++;
+			// if the user didn't enter any more arguments after the option, then he or she is an idiot. break from the main loop.
+			if(arg == argc) break;
+			// the argument directly following the blacklist argument will be taken as out blacklist path
+			logWordsPath = argv[arg];
+			// record the next argument as well (because otherwise it would be skipped)
+			keyprof_log_s("Argument =",argv[arg]);
+			// continue to the next argument
+			continue;
+		}
 		
 		// check to see if the argument matches the overwrite option
 		if(strcmp(argv[arg], KEYPROF_OPT_OVERWRITE) == 0 || strcmp(argv[arg], KEYPROF_OPT_OVERWRITE_SHORT) == 0){
@@ -753,7 +840,7 @@ int keyboard_profiler(int argc, char *argv[]){
 		}
 		
 		// if this argument is not an option, then it must be an input file path.
-		keyprof_crunch_file_word(&keyData[0][0], &keyFrequency[0], &keyStartingFrequency[0], &wordLength[0], argv[arg], includeSymbols, keystrokeMode, blackListPath);
+		keyprof_parse_file_word(&keyData[0][0], &keyFrequency[0], &keyStartingFrequency[0], &wordLength[0], argv[arg], includeSymbols, keystrokeMode, blackListPath, logWordsPath);
 		
 	}
 	

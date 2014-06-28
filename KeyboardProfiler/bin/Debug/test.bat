@@ -1,1 +1,1 @@
-keyprof.exe --include-symbols --output-file test_results.txt --blacklist blacklist.txt test.txt
+keyprof.exe --include-symbols --output-file test_results.txt --blacklist blacklist.txt --log-words !wordData D:\KeyboardProfilerBooks\EnderinExile.txt

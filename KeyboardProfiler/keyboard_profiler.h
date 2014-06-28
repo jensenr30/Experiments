@@ -8,7 +8,7 @@ int keyboard_profiler(int argc, char *argv[]);
 #define KEYPROF_FILE_NOT_FOUND 404
 #define KEYPROF_WORD_LENGTH_MAX 31
 short keyprof_find_string_in_blacklist(char *blackListPath, char *targetWord);
-short keyprof_crunch_file_word(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *keyStartingFrequency, unsigned long long int *wordLength, char *filePath, char includeSymbols, char keystrokeMode, char *blackListPath);
+short keyprof_crunch_file_word(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *keyStartingFrequency, unsigned long long int *wordLength, char *filePath, char includeSymbols, char keystrokeMode, char *blackListPath, char *wordPath);
 
 #define KEYPROF_OUTPUT_NAME_DEFAULT "!keyprof_statistics.txt"
 #define KEYPROF_LOG_NAME_DEFAULT	"!keyprof_log.txt"
@@ -17,6 +17,7 @@ short keyprof_load_stats(char *filePath, unsigned long long int *keyData);
 
 short keyprof_create_filtered_file(char *filePathInput, char *fileBlackListInput, char  *filePathReturn);
 
+short keyprof_log_word(char *folderName, char *word);
 
 /// these are all of the command line options that are available
 
@@ -26,7 +27,7 @@ short keyprof_create_filtered_file(char *filePathInput, char *fileBlackListInput
 
 // if this option is seen, the next argument will be taken as the output path to shove the data into.
 #define KEYPROF_OPT_LOG_PATH				"--log-file"
-#define KEYPROF_OPT_LOG_PATH_SHORT		"-l"
+#define KEYPROF_OPT_LOG_PATH_SHORT			"-l"
 
 // this option will make the program erase the output file if it has any data already in it.
 // the default action is to add the data to it each time.
@@ -51,6 +52,11 @@ short keyprof_create_filtered_file(char *filePathInput, char *fileBlackListInput
 // every word found the blacklist will be rejected when computing the statistics of the sample text documents.
 #define KEYPROF_OPT_BLACKLIST				"--blacklist"
 #define KEYPROF_OPT_BLACKLIST_SHORT			"-b"
+
+// this allows the user to log all words found (excluding blacklisted words)
+// the argument IMMEDIATELY following this option will be interpreted as the folder name where all word data will be stored.
+#define KEYPROF_OPT_LOG_WORDS				"--log-words"
+#define KEYPROF_OPT_LOG_WORDS_SHORT			"-w"
 
 // this is a string of the valid characters.
 // it is set up so that the first half is the lowercase values of each key and the second half is the uppercase values of each key.
