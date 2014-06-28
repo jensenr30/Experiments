@@ -1,1 +1,1 @@
-keyprof.exe -s -f test_results.txt test.txt
+keyprof.exe --include-symbols --output-file test_results.txt --blacklist blacklist.txt test.txt

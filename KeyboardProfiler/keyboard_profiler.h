@@ -2,15 +2,16 @@
 
 // This is returned when there are no input documents to run statistics on.
 #define KEYPROF_NO_INPUT_FILES_PASSED 0xdeadbeef
-#define KEYPROF_LOG_FILE_NAME "keyboard_log.txt"
 #define KEYPROF_KEYS 36
 int keyboard_profiler(int argc, char *argv[]);
 
 #define KEYPROF_FILE_NOT_FOUND 404
 #define KEYPROF_WORD_LENGTH_MAX 31
-short keyprof_crunch_file(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *keyStartingFrequency, unsigned long long int *wordLength, char *filePath, char includeSymbols, char keystrokeMode);
+short keyprof_find_string_in_blacklist(char *blackListPath, char *targetWord);
+short keyprof_crunch_file_word(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *keyStartingFrequency, unsigned long long int *wordLength, char *filePath, char includeSymbols, char keystrokeMode, char *blackListPath);
 
-#define KEYPROF_OUTPUT_NAME_DEFAULT "key_statistics.txt"
+#define KEYPROF_OUTPUT_NAME_DEFAULT "!keyprof_statistics.txt"
+#define KEYPROF_LOG_NAME_DEFAULT	"!keyprof_log.txt"
 short keyprof_save_stats(unsigned long long int *keyData, unsigned long long int *keyFrequency, unsigned long long int *keyStartingFrequency, unsigned long long int *wordLength, char *filePath);
 short keyprof_load_stats(char *filePath, unsigned long long int *keyData);
 
@@ -18,9 +19,14 @@ short keyprof_create_filtered_file(char *filePathInput, char *fileBlackListInput
 
 
 /// these are all of the command line options that are available
+
 // if this option is seen, the next argument will be taken as the output path to shove the data into.
 #define KEYPROF_OPT_OUTPUT_PATH				"--output-file"
 #define KEYPROF_OPT_OUTPUT_PATH_SHORT		"-f"
+
+// if this option is seen, the next argument will be taken as the output path to shove the data into.
+#define KEYPROF_OPT_LOG_PATH				"--log-file"
+#define KEYPROF_OPT_LOG_PATH_SHORT		"-l"
 
 // this option will make the program erase the output file if it has any data already in it.
 // the default action is to add the data to it each time.
@@ -43,7 +49,7 @@ short keyprof_create_filtered_file(char *filePathInput, char *fileBlackListInput
 
 // the argument immediately following this flag will be interpreted as the blacklist document.
 // every word found the blacklist will be rejected when computing the statistics of the sample text documents.
-#define KEYPROF_OPT_WORD_BLACKLIST			"--blacklist"
+#define KEYPROF_OPT_BLACKLIST				"--blacklist"
 #define KEYPROF_OPT_BLACKLIST_SHORT			"-b"
 
 // this is a string of the valid characters.
