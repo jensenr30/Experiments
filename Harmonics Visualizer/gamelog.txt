@@ -6368,3 +6368,41 @@ Seconds =   1.031	FPS =	12
 Seconds =   2.068	FPS =	17
 Seconds =   3.081	FPS =	18
 Seconds =   3.238	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.000	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.000	main() was sent argc =	1
+Seconds =   0.000	START ARGV ARGUMENT LIST:
+Seconds =   0.000	A:\Programming\Experiments\Harmonics Visualizer\Harmonic Visualizer.exe
+Seconds =   0.000	END ARGV LIST
+Seconds =   1.013	FPS =	12
+Seconds =   2.059	FPS =	17
+Seconds =   3.073	FPS =	18
+Seconds =   4.129	FPS =	17
+Seconds =   5.164	FPS =	17
+Seconds =   6.197	FPS =	17
+Seconds =   7.228	FPS =	17
+Seconds =   8.258	FPS =	17
+Seconds =   9.279	FPS =	18
+Seconds =  10.304	FPS =	18
+Seconds =  11.353	FPS =	17
+Seconds =  12.396	FPS =	17
+Seconds =  13.420	FPS =	18
+Seconds =  14.458	FPS =	17
+Seconds =  15.486	FPS =	18
+Seconds =  16.526	FPS =	17
+Seconds =  17.556	FPS =	17
+Seconds =  18.592	FPS =	17
+Seconds =  19.617	FPS =	18
+Seconds =  20.654	FPS =	17
+Seconds =  21.684	FPS =	17
+Seconds =  22.717	FPS =	17
+Seconds =  23.741	FPS =	18
+Seconds =  24.772	FPS =	17
+Seconds =  25.475	block_collector() cleaning up blocks. blockCount =	19

@@ -1,9 +1,0 @@
-A:\Programming\Experiments\C_sharp\TestForm\TestForm\TestForm\bin\Debug\TestForm.exe.config
-A:\Programming\Experiments\C_sharp\TestForm\TestForm\TestForm\bin\Debug\TestForm.exe
-A:\Programming\Experiments\C_sharp\TestForm\TestForm\TestForm\bin\Debug\TestForm.pdb
-A:\Programming\Experiments\C_sharp\TestForm\TestForm\TestForm\obj\Debug\TestForm.Properties.Resources.resources
-A:\Programming\Experiments\C_sharp\TestForm\TestForm\TestForm\obj\Debug\TestForm.csproj.GenerateResource.cache
-A:\Programming\Experiments\C_sharp\TestForm\TestForm\TestForm\obj\Debug\TestForm.csproj.CoreCompileInputs.cache
-A:\Programming\Experiments\C_sharp\TestForm\TestForm\TestForm\obj\Debug\TestForm.exe
-A:\Programming\Experiments\C_sharp\TestForm\TestForm\TestForm\obj\Debug\TestForm.pdb
-A:\Programming\Experiments\C_sharp\TestForm\TestForm\TestForm\obj\Debug\TestForm.csprojAssemblyReference.cache
