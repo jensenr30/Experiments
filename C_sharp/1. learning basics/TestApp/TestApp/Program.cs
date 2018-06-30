@@ -14,139 +14,265 @@ using System.IO;
 namespace TestApp
 {
 
-    public enum Temperature
-    {
-        Freeze,
-        Low,
-        Warm,
-        Boil
-    }
+    //public enum Temperature
+    //{
+    //    Freeze,
+    //    Low,
+    //    Warm,
+    //    Boil
+    //}
 
-    struct Customer
-    {
-        private string name;
-        private double balance;
-        private int id;
+    //struct Customer
+    //{
+    //    private string name;
+    //    private double balance;
+    //    private int id;
 
-        public void createCust(string n, double b, int i)
-        {
-            name = n;
-            balance = b;
-            id = i;
-        }
+    //    public void createCust(string n, double b, int i)
+    //    {
+    //        name = n;
+    //        balance = b;
+    //        id = i;
+    //    }
 
-        public void showCust()
-        {
-            Console.WriteLine("Name     " + name);
-            Console.WriteLine("Balance  {0:c}", balance);
-            Console.WriteLine("ID       " + id);
-        }
-    }
+    //    public void showCust()
+    //    {
+    //        Console.WriteLine("Name     " + name);
+    //        Console.WriteLine("Balance  {0:c}", balance);
+    //        Console.WriteLine("ID       " + id);
+    //    }
+    //}
 
-    class Animal
-    {
-        public double height { get; set; }
-        public double weight { get; set; }
-        public string sound  { get; set; }
+    //class Animal
+    //{
+    //    public double height { get; set; }
+    //    public double weight { get; set; }
+    //    public string sound  { get; set; }
 
-        public string name;
-        public string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
+    //    public string name;
+    //    public string Name
+    //    {
+    //        get { return name; }
+    //        set { name = value; }
+    //    }
 
-        public Animal()
-        {
-            this.height = 0;
-            this.weight = 0;
-            this.name = "no name";
-            this.sound = "no sound";
-            numOfAnimals++;
-        }
+    //    public Animal()
+    //    {
+    //        this.height = 0;
+    //        this.weight = 0;
+    //        this.name = "no name";
+    //        this.sound = "no sound";
+    //        numOfAnimals++;
+    //    }
 
-        public Animal(double height, double weight, string name, string sound)
-        {
-            this.height = height;
-            this.weight = weight;
-            this.name = name;
-            this.sound = sound;
-            numOfAnimals++;
-        }
+    //    public Animal(double height, double weight, string name, string sound)
+    //    {
+    //        this.height = height;
+    //        this.weight = weight;
+    //        this.name = name;
+    //        this.sound = sound;
+    //        numOfAnimals++;
+    //    }
 
-        static int numOfAnimals = 0;
+    //    static int numOfAnimals = 0;
 
-        public static int getNumOfAnimals()
-        {
-            return numOfAnimals;
-        }
+    //    public static int getNumOfAnimals()
+    //    {
+    //        return numOfAnimals;
+    //    }
 
-        public string ToString()
-        {
-            return String.Format("{0} is {1} inches tall, and weighs {2} lbs. It makes the sound, \"{3}\"",name, height, weight, sound);
-        }
+    //    public string ToString()
+    //    {
+    //        return String.Format("{0} is {1} inches tall, and weighs {2} lbs. It makes the sound, \"{3}\"",name, height, weight, sound);
+    //    }
 
-        public int getSum(int num1 = 1, int num2 = 1)
-        {
-            return num1 + num2;
-        }
+    //    public int getSum(int num1 = 1, int num2 = 1)
+    //    {
+    //        return num1 + num2;
+    //    }
 
-        public double getSum(double num1 = 1, double num2 = 1)
-        {
-            return num1 + num2;
-        }
+    //    public double getSum(double num1 = 1, double num2 = 1)
+    //    {
+    //        return num1 + num2;
+    //    }
 
-    }
+    //}
 
 
 
-    class Dog : Animal
-    {
-        public string favFood { get; set; }
+    //class Dog : Animal
+    //{
+    //    public string favFood { get; set; }
 
-        public Dog() : base()
-        {
-            this.favFood = "No Favorite Food";
-        }
+    //    public Dog() : base()
+    //    {
+    //        this.favFood = "No Favorite Food";
+    //    }
 
-        public Dog(double height, double weight, string name, string sound, string favFood) : base(height, weight, name, sound)
-        {
-            this.favFood = favFood;
-        }
+    //    public Dog(double height, double weight, string name, string sound, string favFood) : base(height, weight, name, sound)
+    //    {
+    //        this.favFood = favFood;
+    //    }
 
-        new public string ToString()
-        {
-            return String.Format("{0} is {1} inches tall, and weighs {2} lbs. It makes the sound, \"{3}\". His favorite food is {4}", name, height, weight, sound, favFood);
-        }
+    //    new public string ToString()
+    //    {
+    //        return String.Format("{0} is {1} inches tall, and weighs {2} lbs. It makes the sound, \"{3}\". His favorite food is {4}", name, height, weight, sound, favFood);
+    //    }
 
-    }
+    //}
 
+    //class Member
+    //{
+    //    private string name;
+    //    private int memberID;
+    //    private int memberSince;
+    //    protected decimal annualFee;
+
+    //    public override string ToString()
+    //    {
+    //        return
+    //            "name: " + name +
+    //            "\nmember ID: " + memberID +
+    //            "\nmember since: " + memberSince +
+    //            "\ntotal annual fee: " + annualFee;
+    //    }
+
+    //    public Member()
+    //    {
+    //        Console.WriteLine("Parent Constructor with 0 parameters");
+    //    }
+
+    //    public Member(string pName, int pMemberID, int pMemberSince)
+    //    {
+    //        Console.WriteLine("Parent Constructor with 3 parameters");
+    //        name = pName;
+    //        memberID = pMemberID;
+    //        memberSince = pMemberSince;
+    //    }
+
+    //    public virtual void CalculateAnnualFee()
+    //    {
+    //        annualFee = 0;
+    //    }
+    //}
+
+    
+    //class MemberNormal : Member
+    //{
+    //    public MemberNormal(string pName, int pMemberID, int pMemberSince) : base(pName, pMemberID, pMemberSince)
+    //    {
+    //        Console.WriteLine("Child Constructor with 3 parameters");
+    //    }
+
+    //    public override void CalculateAnnualFee()
+    //    {
+    //        annualFee = 100.00m + 12.00m * 30.00m;
+    //    }
+    //}
+
+
+    //class MemberVIP : Member
+    //{
+    //    public MemberVIP(string pName, int pMemberID, int pMemberSince) : base(pName, pMemberID, pMemberSince)
+    //    {
+    //        Console.WriteLine("Child Constructor with 3 parameters");
+    //    }
+
+    //    public override void CalculateAnnualFee()
+    //    {
+    //        annualFee = 1200.00m;
+    //    }
+    //}
+
+
+    //enum DaysOfWeek
+    //{
+    //    Mon, Tue, Wed, Thu, Fri, Sat, Sun
+    //}
 
     class Program
     {
         
         static void Main(string[] args)
         {
-
-            string[] custs = new string[] { "Tom", "Paul", "Greg" };
-
-            using (StreamWriter sw = new StreamWriter("custs.txt"))
+            string filePath = "deleteme.txt";
+            if (File.Exists(filePath))
             {
-                foreach(string cust in custs)
+                using (StreamReader sr = new StreamReader(filePath))
                 {
-                    sw.WriteLine(cust);
+                    while (sr.EndOfStream != true)
+                    {
+                        Console.WriteLine(sr.ReadLine());
+                    }
+                    sr.Close();
                 }
             }
-
-            string custName = "";
-
-            using (StreamReader sr = new StreamReader("custs.txt"))
+            else
             {
-                while((custName = sr.ReadLine()) != null)
-                {
-                    Console.WriteLine(custName);
-                }
+                Console.WriteLine("File \"{0}\" does not exist.",filePath);
             }
+
+            // open file to append text
+            using (StreamWriter sw = new StreamWriter(filePath, true))
+            {
+                sw.WriteLine("It is easy to write to a file in C#");
+                sw.Close();
+            }
+            
+            
+
+
+            //int[] numbers = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 14, 14 };
+
+            //var query =
+            //    from n in numbers
+            //    where (n % 2) == 0
+            //    select n;
+
+            //foreach(int n in query)
+            //{
+            //    Console.WriteLine(n);
+            //}
+
+            //Console.WriteLine(query.ToString());
+
+            //Member[] mems = new Member[2];
+
+            //mems[0] = new MemberVIP("Matt", 1, 1990);
+            //mems[1] = new MemberNormal("Ryan", 2, 1995);
+
+            //foreach(Member m in mems)
+            //{
+            //    m.CalculateAnnualFee();
+            //    Console.WriteLine(m.ToString());
+            //}
+
+            //DaysOfWeek theDay = (DaysOfWeek)10;
+
+            //Console.WriteLine((DaysOfWeek)theDay);
+
+
+
+
+            //string[] custs = new string[] { "Tom", "Paul", "Greg" };
+
+            //using (StreamWriter sw = new StreamWriter("custs.txt"))
+            //{
+            //    foreach (string cust in custs)
+            //    {
+            //        sw.WriteLine(cust);
+            //    }
+            //}
+
+            //string custName = "";
+
+            //using (StreamReader sr = new StreamReader("custs.txt"))
+            //{
+            //    while ((custName = sr.ReadLine()) != null)
+            //    {
+            //        Console.WriteLine(custName);
+            //    }
+            //}
 
             //List<int> numList = new List<int> { 5, 10, 15, 20, 25 };
 
@@ -477,79 +603,79 @@ namespace TestApp
         }
     }
 
-    abstract class Shape
-    {
-        public abstract double area();
+    //abstract class Shape
+    //{
+    //    public abstract double area();
 
-        public void sayHi()
-        {
-            Console.WriteLine("Hello");
-        }
-    }
+    //    public void sayHi()
+    //    {
+    //        Console.WriteLine("Hello");
+    //    }
+    //}
 
 
-    public interface ShapeItem
-    {
-        double area();
-    }
+    //public interface ShapeItem
+    //{
+    //    double area();
+    //}
 
-    class Rectangle : Shape
-    {
-        private double length;
-        private double width;
+    //class Rectangle : Shape
+    //{
+    //    private double length;
+    //    private double width;
 
-        public Rectangle(double L, double W)
-        {
-            length = L;
-            width = W;
-        }
+    //    public Rectangle(double L, double W)
+    //    {
+    //        length = L;
+    //        width = W;
+    //    }
 
-        public static Rectangle operator+ (Rectangle rect1, Rectangle rect2)
-        {
-            double rectLength = rect1.length + rect2.length;
-            double rectWidth = rect1.width + rect2.width;
-            return new Rectangle(rectLength, rectWidth);
-        }
+    //    public static Rectangle operator+ (Rectangle rect1, Rectangle rect2)
+    //    {
+    //        double rectLength = rect1.length + rect2.length;
+    //        double rectWidth = rect1.width + rect2.width;
+    //        return new Rectangle(rectLength, rectWidth);
+    //    }
 
-        public override double area()
-        {
-            return length * width;
-        }
-    }
+    //    public override double area()
+    //    {
+    //        return length * width;
+    //    }
+    //}
 
-    class Triangle : Shape
-    {
-        private double tri_base;
-        private double tri_height;
+    //class Triangle : Shape
+    //{
+    //    private double tri_base;
+    //    private double tri_height;
 
-        public Triangle(double B, double H)
-        {
-            tri_base = B;
-            tri_height = H;
-        }
+    //    public Triangle(double B, double H)
+    //    {
+    //        tri_base = B;
+    //        tri_height = H;
+    //    }
 
-        public override double area()
-        {
-            return 0.5 * tri_base * tri_height;
-        }
-    }
+    //    public override double area()
+    //    {
+    //        return 0.5 * tri_base * tri_height;
+    //    }
+    //}
 
-    class KeyValue<TKey, TValue>
-    {
-        public TKey key { get; set; }
-        public TValue value { get; set; }
+    //class KeyValue<TKey, TValue>
+    //{
+    //    public TKey key { get; set; }
+    //    public TValue value { get; set; }
 
-        public KeyValue(TKey k, TValue v)
-        {
-            key = k;
-            value = v;
-        }
+    //    public KeyValue(TKey k, TValue v)
+    //    {
+    //        key = k;
+    //        value = v;
+    //    }
 
-        public void showData()
-        {
-            Console.WriteLine("{0} is {1} ", this.key, this.value);
-        }
+    //    public void showData()
+    //    {
+    //        Console.WriteLine("{0} is {1} ", this.key, this.value);
+    //    }
         
 
-    }
+    //}
 }
