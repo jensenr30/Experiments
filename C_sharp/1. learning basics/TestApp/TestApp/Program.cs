@@ -9,6 +9,7 @@ using System.Text;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading;
 using System.IO;
 
 namespace TestApp
@@ -189,7 +190,7 @@ namespace TestApp
     //{
     //    Mon, Tue, Wed, Thu, Fri, Sat, Sun
     //}
-
+    
     class Program
     {
         
@@ -218,7 +219,17 @@ namespace TestApp
                 sw.WriteLine("It is easy to write to a file in C#");
                 sw.Close();
             }
-            
+
+
+            DateTime timeReference = DateTime.Now;
+            TimeSpan timeDifference;
+            int delay_ms = 1;
+            for(int i=0; i<5; i++)
+            {
+                Thread.Sleep(1000);
+                timeDifference = (DateTime.Now - timeReference);
+                Console.WriteLine(timeDifference.TotalMilliseconds/1000.0);
+            }
             
 
 

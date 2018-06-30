@@ -57,7 +57,7 @@ namespace GravityChaos
         public static void Update(List<Particle> Particles, double Time)
         {
             // perform collision check on all particles
-            CollisionCheckAll(Particles);
+            CollisionCheckAndResolveAll(Particles);
 
             //------------------------------------------------------------------
             // calculate the net forces acting on all particles
@@ -133,8 +133,9 @@ namespace GravityChaos
         }
 
 
-        // returns if it found a collision or not.
-        public static void CollisionCheckAll(List<Particle> Particles)
+        // this function will check all particles in the list.
+        // it resolves all collisions.
+        public static void CollisionCheckAndResolveAll(List<Particle> Particles)
         {
             bool FoundCollision;
             do
@@ -148,12 +149,8 @@ namespace GravityChaos
                     {
                         for (int p2 = p1 + 1; ((p2 < c) && (!FoundCollision)); p2++)
                         {
-                            // calculate the distance between the objects squared
-                            double dist_squared =
-                                Math.Pow(Particles[p1].PositionX - Particles[p2].PositionX, 2) +
-                                Math.Pow(Particles[p1].PositionY - Particles[p2].PositionY, 2);
                             // if the particles touch, or are overlapping
-                            if (dist_squared <= Math.Pow(Particles[p1].Radius() + Particles[p2].Radius(), 2))
+                            if (Particle.CollisionCheck(Particles[p1], Particles[p2]))
                             {
                                 Particle.Collision(Particles, Particles[p1], Particles[p2]);
                                 FoundCollision = true;
@@ -166,8 +163,21 @@ namespace GravityChaos
         }
 
 
+        // this function will tell you if two particles are touching
+        public static bool CollisionCheck(Particle p1, Particle p2)
+        {
+            // calculate the distance between the objects squared
+            double dist_squared =
+                Math.Pow(p1.PositionX - p2.PositionX, 2) +
+                Math.Pow(p1.PositionY - p2.PositionY, 2);
+            // if the distance squared between the two objects is less than or equal to the
+            // sum of the squares of the two radii, then the two objects are touching.
+            return (dist_squared <= Math.Pow(p1.Radius() + p2.Radius(), 2));
+        }
+
+
         // call this function when two particles collide!
-        public static void Collision(List<Particle> Particles, Particle p1, Particle p2)
+        private static void Collision(List<Particle> Particles, Particle p1, Particle p2)
         {
             // p1 becomes the combination of p1 and p2 in terms of mass, position, and momentum.
             // (p1 + p2) -> p1
