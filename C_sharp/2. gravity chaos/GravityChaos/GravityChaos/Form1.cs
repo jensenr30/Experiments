@@ -25,6 +25,8 @@ namespace Form1
         int ImageWidth;
         // create new bitmap to which our image will be printed
         Bitmap Image;
+        // this is the name of the file to which the final image is stored
+        string outputFileName;
         // x and y keep track of which pixel we are testing.
         // The pixels of the screen are evaluated from left to right, then
         // from top to bottom, like reading a book in english.
@@ -71,10 +73,12 @@ namespace Form1
             //------------------------------------------------------------------
             // Define bitmap size for rendering the image of gravity chaos
             //------------------------------------------------------------------
-            ImageHeight = 1080;
+            ImageHeight = 100;
             ImageWidth = (int)(ImageHeight * AspectRatio);
             // create new bitmap to which our image will be printed
             Image = new Bitmap(ImageWidth, ImageHeight);
+            // where to save final image
+            outputFileName = "output.bmp";
             // x and y keep track of which pixel we are testing.
             // The pixels of the screen are evaluated from left to right, then
             // from top to bottom, like reading a book in english.
@@ -113,11 +117,33 @@ namespace Form1
             this.Particles.Add(
                 new Particle
                 {
-                    Color = Color.Red,
+                    Color = Color.Blue,
                     PositionX = SpaceWidth * 2.0 / 3.0,
                     PositionY = SpaceHeight / 2.0,
                     Fixed = true,
                     Mass = ParticleMass
+                }
+            );
+            // stationary particle 3
+            this.Particles.Add(
+                new Particle
+                {
+                    Color = Color.Lime,
+                    PositionX = SpaceWidth,
+                    PositionY = SpaceHeight,
+                    Fixed = true,
+                    Mass = ParticleMass*2
+                }
+            );
+            // stationary particle 3
+            this.Particles.Add(
+                new Particle
+                {
+                    Color = Color.Magenta,
+                    PositionX = SpaceWidth / 4,
+                    PositionY = SpaceHeight / 4,
+                    Fixed = true,
+                    Mass = ParticleMass / 2
                 }
             );
 
@@ -129,6 +155,8 @@ namespace Form1
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             // draw the new position of the particles on the screen
+            //
+            e.Graphics.DrawImage(Image, 0, 0);
             Particle.Draw(Particles, e.Graphics);
         }
 
@@ -137,7 +165,7 @@ namespace Form1
         // always get control back to the map-generating routine.
         private void timer1_Tick(object sender, EventArgs e)
         {
-            /*
+            
             // record when you entered the loop
             DateTime TimeOfEntry = DateTime.Now;
             int ElapsedTimeMs;
@@ -154,15 +182,28 @@ namespace Form1
                 // run the simulation until the moving particle hits one of the stationary particles
                 // have a timeout to prevent the programming from going in an endless loop
                 bool collision = false;
-                int iterations = 0, iterations_max = 10000;
-                while((!collision) && (iterations < iterations_max))
+                int iterations = 0, iterations_max = 1000;
+                while ((!collision) && (iterations < iterations_max))
                 {
                     Particle.Update(Particles, .5);
-                    Particle.CollisionCheckAll;
+                    // check to see if the moving particle has collided with any of the others
+                    foreach (Particle p in Particles.GetRange(1, Particles.Count - 1))
+                    {
+                        collision = Particle.CollisionCheck(Particles[0], p);
+                        // if the particle collided, set the pixel to the appropriate color.
+                        if (collision)
+                        {
+                            Image.SetPixel(x, y, p.Color);
+                            break;
+                        }
+                    }
                     iterations++;
                 }
                 // depending on which target our moving particle hits, color the <x, y> pixel accordingly
-
+                if (!collision)
+                {
+                    Image.SetPixel(x, y, Color.Black);
+                }
 
                 // increment x and y
                 x++;
@@ -177,14 +218,15 @@ namespace Form1
                 {
                     // TODO: save the image
                     // close the form
+                    
+                    Image.Save(outputFileName,System.Drawing.Imaging.ImageFormat.Png);
                     this.Close();
                 }
                 ElapsedTimeMs = (int)(DateTime.Now - TimeOfEntry).TotalMilliseconds;
             }
             // keep working on the map until you need to refresh the screen again
-            while (0);//(ElapsedTimeMs < this.ScreenRefreshPeriodMs);
-            */
-            Particle.Update(Particles, 0.5);
+            while (ElapsedTimeMs < this.ScreenRefreshPeriodMs);
+            
             // force the screen to be redrawn
             Invalidate();
         }

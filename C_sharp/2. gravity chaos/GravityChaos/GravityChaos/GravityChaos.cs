@@ -56,9 +56,6 @@ namespace GravityChaos
         //======================================================================
         public static void Update(List<Particle> Particles, double Time)
         {
-            // perform collision check on all particles
-            CollisionCheckAndResolveAll(Particles);
-
             //------------------------------------------------------------------
             // calculate the net forces acting on all particles
             //------------------------------------------------------------------
