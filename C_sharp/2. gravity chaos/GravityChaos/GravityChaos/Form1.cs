@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GravityChaos;
+using System.Media;
 
 
 namespace Form1
@@ -27,6 +28,8 @@ namespace Form1
         Bitmap Image;
         // this is the name of the file to which the final image is stored
         string outputFileName;
+        // this lets us know if we need to continue updating the image
+        bool imageComplete;
         // x and y keep track of which pixel we are testing.
         // The pixels of the screen are evaluated from left to right, then
         // from top to bottom, like reading a book in english.
@@ -73,12 +76,15 @@ namespace Form1
             //------------------------------------------------------------------
             // Define bitmap size for rendering the image of gravity chaos
             //------------------------------------------------------------------
-            ImageHeight = 100;
+            ImageHeight = 2160;
+            //ImageHeight = 300;
             ImageWidth = (int)(ImageHeight * AspectRatio);
             // create new bitmap to which our image will be printed
             Image = new Bitmap(ImageWidth, ImageHeight);
             // where to save final image
-            outputFileName = "output.bmp";
+            outputFileName = "output.png";
+            // we need to generate the image
+            imageComplete = false;
             // x and y keep track of which pixel we are testing.
             // The pixels of the screen are evaluated from left to right, then
             // from top to bottom, like reading a book in english.
@@ -158,6 +164,7 @@ namespace Form1
             //
             e.Graphics.DrawImage(Image, 0, 0);
             Particle.Draw(Particles, e.Graphics);
+            this.Text = "GravityChaos: Drawing... " + (y * 100 / ImageHeight) + "% complete";
         }
 
 
@@ -165,70 +172,81 @@ namespace Form1
         // always get control back to the map-generating routine.
         private void timer1_Tick(object sender, EventArgs e)
         {
-            
-            // record when you entered the loop
-            DateTime TimeOfEntry = DateTime.Now;
-            int ElapsedTimeMs;
-            // work on the map
-            do
+            if (!imageComplete)
             {
-                // start the particle out at the current <x, y> coordinates
-                Particles[0].PositionX = ImageToParticleSpace(x);
-                Particles[0].PositionY = ImageToParticleSpace(y);
-                // set the moving particle's initial velocity to 0.
-                Particles[0].VelocityX = 0;
-                Particles[0].VelocityY = 0;
-
-                // run the simulation until the moving particle hits one of the stationary particles
-                // have a timeout to prevent the programming from going in an endless loop
-                bool collision = false;
-                int iterations = 0, iterations_max = 1000;
-                while ((!collision) && (iterations < iterations_max))
+                // record when you entered the loop
+                DateTime TimeOfEntry = DateTime.Now;
+                int ElapsedTimeMs;
+                // work on the map
+                do
                 {
-                    Particle.Update(Particles, .5);
-                    // check to see if the moving particle has collided with any of the others
-                    foreach (Particle p in Particles.GetRange(1, Particles.Count - 1))
+                    // start the particle out at the current <x, y> coordinates
+                    Particles[0].PositionX = ImageToParticleSpace(x);
+                    Particles[0].PositionY = ImageToParticleSpace(y);
+                    // set the moving particle's initial velocity to 0.
+                    Particles[0].VelocityX = 0;
+                    Particles[0].VelocityY = 0;
+
+                    // run the simulation until the moving particle hits one of the stationary particles
+                    // have a timeout to prevent the programming from going in an endless loop
+                    bool collision = false;
+                    int iterations = 0, iterations_max = 50;
+                    while ((!collision) && (iterations < iterations_max))
                     {
-                        collision = Particle.CollisionCheck(Particles[0], p);
-                        // if the particle collided, set the pixel to the appropriate color.
-                        if (collision)
+                        // check to see if the moving particle has collided with any of the others
+                        foreach (Particle p in Particles.GetRange(1, Particles.Count - 1))
                         {
-                            Image.SetPixel(x, y, p.Color);
-                            break;
+                            collision = Particle.CollisionCheck(Particles[0], p);
+                            // if the particle collided, set the pixel to the appropriate color.
+                            if (collision)
+                            {
+                                Image.SetPixel(x, y, p.Color);
+                                break;
+                            }
                         }
+                        // run the simulation for a little while
+                        Particle.Update(Particles, 30);
+                        iterations++;
                     }
-                    iterations++;
-                }
-                // depending on which target our moving particle hits, color the <x, y> pixel accordingly
-                if (!collision)
-                {
-                    Image.SetPixel(x, y, Color.Black);
-                }
+                    // depending on which target our moving particle hits, color the <x, y> pixel accordingly
+                    if (!collision)
+                    {
+                        Image.SetPixel(x, y, Color.Black);
+                    }
 
-                // increment x and y
-                x++;
-                // if you have gotten to the right edge of the bitmap,
-                if (x >= ImageWidth)
-                {
-                    x = 0;
-                    y++;
+                    // increment x and y
+                    x++;
+                    // if you have gotten to the right edge of the bitmap,
+                    if (x >= ImageWidth)
+                    {
+                        x = 0;
+                        y++;
+                    }
+                    // if you have completed the image, close it.
+                    if (y >= ImageHeight)
+                    {
+
+                        Image.Save(outputFileName, System.Drawing.Imaging.ImageFormat.Png);
+                        imageComplete = true;
+                        try
+                        {
+                            SoundPlayer player = new SoundPlayer("gotmail.mp3");
+                            player.Play();
+                        }
+                        catch
+                        {
+                            // oh well.
+                        }
+                        
+                    }
+                    ElapsedTimeMs = (int)(DateTime.Now - TimeOfEntry).TotalMilliseconds;
                 }
-                // if you have completed the image, close it.
-                if (y >= ImageHeight)
-                {
-                    // TODO: save the image
-                    // close the form
-                    
-                    Image.Save(outputFileName,System.Drawing.Imaging.ImageFormat.Png);
-                    this.Close();
-                }
-                ElapsedTimeMs = (int)(DateTime.Now - TimeOfEntry).TotalMilliseconds;
+                // keep working on the map until you need to refresh the screen again
+                while ((ElapsedTimeMs < this.ScreenRefreshPeriodMs) && !imageComplete);
+
+                // force the screen to be redrawn
+                Invalidate();
             }
-            // keep working on the map until you need to refresh the screen again
-            while (ElapsedTimeMs < this.ScreenRefreshPeriodMs);
-            
-            // force the screen to be redrawn
-            Invalidate();
         }
 
 
