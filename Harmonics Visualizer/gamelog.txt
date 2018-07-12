@@ -6406,3 +6406,103 @@ Seconds =  22.717	FPS =	17
 Seconds =  23.741	FPS =	18
 Seconds =  24.772	FPS =	17
 Seconds =  25.475	block_collector() cleaning up blocks. blockCount =	19
+Seconds =   0.012	
+
+
+
+== PROGRAM START ======================================================
+
+
+
+
+Seconds =   0.012	main() was sent argc =	1
+Seconds =   0.012	START ARGV ARGUMENT LIST:
+Seconds =   0.013	A:\Programming\Experiments\Harmonics Visualizer\Harmonic Visualizer.exe
+Seconds =   0.013	END ARGV LIST
+Seconds =   1.017	FPS =	11
+Seconds =   2.039	FPS =	18
+Seconds =   3.063	FPS =	18
+Seconds =   4.067	FPS =	17
+Seconds =   5.079	FPS =	18
+Seconds =   6.087	FPS =	18
+Seconds =   7.139	FPS =	18
+Seconds =   8.192	FPS =	18
+Seconds =   9.191	FPS =	18
+Seconds =  10.246	FPS =	18
+Seconds =  11.250	FPS =	18
+Seconds =  12.273	FPS =	18
+Seconds =  13.282	FPS =	18
+Seconds =  14.295	FPS =	18
+Seconds =  15.306	FPS =	18
+Seconds =  16.314	FPS =	18
+Seconds =  17.318	FPS =	18
+Seconds =  18.372	FPS =	18
+Seconds =  19.380	FPS =	18
+Seconds =  20.386	FPS =	18
+Seconds =  21.389	FPS =	18
+Seconds =  22.442	FPS =	18
+Seconds =  23.497	FPS =	18
+Seconds =  24.552	FPS =	18
+Seconds =  25.561	FPS =	18
+Seconds =  26.567	FPS =	18
+Seconds =  27.620	FPS =	18
+Seconds =  28.626	FPS =	18
+Seconds =  29.640	FPS =	18
+Seconds =  30.645	FPS =	18
+Seconds =  31.699	FPS =	18
+Seconds =  32.723	FPS =	16
+Seconds =  33.736	FPS =	16
+Seconds =  34.751	FPS =	16
+Seconds =  35.763	FPS =	16
+Seconds =  36.772	FPS =	16
+Seconds =  37.795	FPS =	16
+Seconds =  38.837	FPS =	15
+Seconds =  39.851	FPS =	16
+Seconds =  40.890	FPS =	15
+Seconds =  41.935	FPS =	15
+Seconds =  42.977	FPS =	15
+Seconds =  44.040	FPS =	15
+Seconds =  45.083	FPS =	15
+Seconds =  46.123	FPS =	15
+Seconds =  47.158	FPS =	15
+Seconds =  48.188	FPS =	16
+Seconds =  49.217	FPS =	16
+Seconds =  50.244	FPS =	16
+Seconds =  51.277	FPS =	15
+Seconds =  52.329	FPS =	15
+Seconds =  53.382	FPS =	15
+Seconds =  54.441	FPS =	15
+Seconds =  55.491	FPS =	15
+Seconds =  56.543	FPS =	15
+Seconds =  57.597	FPS =	15
+Seconds =  58.654	FPS =	15
+Seconds =  59.694	FPS =	15
+Seconds =  60.730	FPS =	15
+Seconds =  61.784	FPS =	15
+Seconds =  62.835	FPS =	15
+Seconds =  63.888	FPS =	15
+Seconds =  64.919	FPS =	16
+Seconds =  65.923	FPS =	16
+Seconds =  66.978	FPS =	15
+Seconds =  68.016	FPS =	15
+Seconds =  69.049	FPS =	15
+Seconds =  70.100	FPS =	15
+Seconds =  71.157	FPS =	15
+Seconds =  72.211	FPS =	15
+Seconds =  73.269	FPS =	15
+Seconds =  74.310	FPS =	15
+Seconds =  75.352	FPS =	15
+Seconds =  76.394	FPS =	15
+Seconds =  77.435	FPS =	15
+Seconds =  78.468	FPS =	15
+Seconds =  79.498	FPS =	16
+Seconds =  80.524	FPS =	16
+Seconds =  81.553	FPS =	16
+Seconds =  82.578	FPS =	16
+Seconds =  83.610	FPS =	16
+Seconds =  84.645	FPS =	15
+Seconds =  85.692	FPS =	15
+Seconds =  86.728	FPS =	15
+Seconds =  87.764	FPS =	15
+Seconds =  88.804	FPS =	15
+Seconds =  89.404	block_collector() cleaning up blocks. blockCount =	19
