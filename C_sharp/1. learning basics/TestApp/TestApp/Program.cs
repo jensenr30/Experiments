@@ -8,8 +8,8 @@ using System;
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using System.IO;
 
 namespace TestApp
@@ -194,43 +194,66 @@ namespace TestApp
     class Program
     {
         
+
+        static void DisplayMsgPeriodically()
+        {
+            while(true)
+            {
+                Console.WriteLine("Hi");
+                Thread.Sleep(2000);
+            }
+        }
+
+
         static void Main(string[] args)
         {
-            string filePath = "deleteme.txt";
-            if (File.Exists(filePath))
-            {
-                using (StreamReader sr = new StreamReader(filePath))
-                {
-                    while (sr.EndOfStream != true)
-                    {
-                        Console.WriteLine(sr.ReadLine());
-                    }
-                    sr.Close();
-                }
-            }
-            else
-            {
-                Console.WriteLine("File \"{0}\" does not exist.",filePath);
-            }
 
-            // open file to append text
-            using (StreamWriter sw = new StreamWriter(filePath, true))
-            {
-                sw.WriteLine("It is easy to write to a file in C#");
-                sw.Close();
-            }
+            Thread t1 = new Thread(new ThreadStart(DisplayMsgPeriodically));
+            Thread t2 = new Thread(new ThreadStart(DisplayMsgPeriodically));
+            t1.Start();
+            t2.Start();
+
+            Thread.Sleep(5000);
 
 
-            DateTime timeReference = DateTime.Now;
-            TimeSpan timeDifference;
-            int delay_ms = 1;
-            for(int i=0; i<5; i++)
-            {
-                Thread.Sleep(1000);
-                timeDifference = (DateTime.Now - timeReference);
-                Console.WriteLine(timeDifference.TotalMilliseconds/1000.0);
-            }
-            
+
+            #region unused code
+
+            //string filePath = "deleteme.txt";
+            //if (File.Exists(filePath))
+            //{
+            //    using (StreamReader sr = new StreamReader(filePath))
+            //    {
+            //        while (sr.EndOfStream != true)
+            //        {
+            //            Console.WriteLine(sr.ReadLine());
+            //        }
+            //        sr.Close();
+            //    }
+            //}
+            //else
+            //{
+            //    Console.WriteLine("File \"{0}\" does not exist.",filePath);
+            //}
+
+            //// open file to append text
+            //using (StreamWriter sw = new StreamWriter(filePath, true))
+            //{
+            //    sw.WriteLine("It is easy to write to a file in C#");
+            //    sw.Close();
+            //}
+
+
+            //DateTime timeReference = DateTime.Now;
+            //TimeSpan timeDifference;
+            //int delay_ms = 1;
+            //for(int i=0; i<5; i++)
+            //{
+            //    Thread.Sleep(1000);
+            //    timeDifference = (DateTime.Now - timeReference);
+            //    Console.WriteLine(timeDifference.TotalMilliseconds/1000.0);
+            //}
+
 
 
             //int[] numbers = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 14, 14 };
@@ -610,7 +633,7 @@ namespace TestApp
 
 
 
-
+            #endregion
         }
     }
 
