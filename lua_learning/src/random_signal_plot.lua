@@ -13,7 +13,7 @@ end
 
 -- this function creates a vertical plot of random steps
 function random_step_plot(width,height)
-    x = width//2;
+    x = math.floor(width/2);
     math.randomseed(os.time())
     for r = 1,height do
         -- determine the step direction of x
@@ -30,15 +30,15 @@ function random_step_plot(width,height)
 end
 
 function gaussian_plot(width,height,gaussian_number)
-    xlast = width//2
+    local xlast = math.floor(width/2)
     for r = 1,height do
-        x = 0
+        local x = 0
         for g = 1,gaussian_number do
             x = x + math.random(-1,1)*width/2
         end
         x = x / math.sqrt(gaussian_number)
-        x = x//4
-        x = x + width//2;
+        x = math.floor(x/4)
+        x = x + math.floor(width/2);
         x = math.max(1,math.min(width,x))           -- limit the domain of x
         for c = 1,math.min(x,xlast)-1 do io.write(' ') end
         for o = 1,math.abs(x-xlast)   do io.write('o') end

@@ -1,5 +1,14 @@
--- this function will print a table to the console
---
+--[[ 
+table_print.lua
+Ryan Jensen
+2018-12-16
+This function will print the structure and contents of a table to the console.
+INPUTS:
+  - T             REQUIRED   table   the table that will be printed
+  - max_level    (optional)  number  max recursive level of tables to print
+  - indentation  (optional)  number  number of tabs to print before table info
+  - T_original   (optional)  table   this table will be ignored (not printed)
+--]]
 function table_print(T,max_level,indentation,T_original)
     
     -- assume there is no indentation unless specified by the caller
