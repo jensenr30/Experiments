@@ -11,6 +11,10 @@ INPUTS:
 --]]
 function table_print(T,max_level,indentation,T_original)
     
+    if(type(T) ~= "table") then
+    	error("T must be a table. Received type(T) = " .. type(T))
+    end
+    
     -- assume there is no indentation unless specified by the caller
     if(indentation == nil) then indentation = 0 end
     local tabs = string.rep('\t',indentation)

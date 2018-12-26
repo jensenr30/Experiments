@@ -1,6 +1,8 @@
+--------------------------------------------------------------------------------
 -- polynomial.lua
 -- Ryan Jensen
 -- 2018-12-16
+--------------------------------------------------------------------------------
 -- this function calculates the numerical value of a polynomial.
 -- input (a) is a table containing the coefficients of a polynomial:
 --
@@ -16,18 +18,19 @@
 --
 -- nil entries are treated as zeros (ignored)
 -- if the table contains string keys (i.e. a.color) they are ignored
+-- --------------------------------------------------------------------------------
 function poly_evaluate(a,x)
 
-  if(type(x) ~= "number") then
-    error("x is not a number! x must be a number.")
-  end
+	if(type(x) ~= "number") then
+		error("x is not a number! x must be a number.")
+	end
 
-  local sum = 0
+	local sum = 0
 
-  for e in pairs(a) do
-    if(type(e) == "number") then
-      sum = sum + (a[e] * x^e)
-    end
-  end
-  return sum
+	for e in pairs(a) do
+		if(type(e) == "number") then
+			sum = sum + (a[e] * x^e)
+		end
+	end
+	return sum
 end
