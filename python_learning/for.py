@@ -6,7 +6,7 @@
 words = ["These", "Are", "Some", "Of", "My", "Favorite", "Words"]
 
 for w in words:
-	print(len(w),w)
+    print(len(w),w)
 
 for i in range(len(words)):
-	print("\"" + words[i] + "\" is the [" + str(i) + "] element")
+    print("\"" + words[i] + "\" is the [" + str(i) + "] element")
